@@ -2,7 +2,7 @@
 {% from "macros.html" import project_entry %}
 {% block content %}
   <h1>{{ profile.website.headline }}</h1>
-  <div class="lead">{{ block(profile.website.intro) }}</div>
+  {{ block(profile.website.intro) }}
   {{ block(profile.website.status) }}
 
   {%- if featured %}

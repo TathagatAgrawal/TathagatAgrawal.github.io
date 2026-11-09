@@ -1,4 +1,5 @@
-/* The whole stylesheet. Grayscale only, system fonts, one readable column. */
+/* The whole stylesheet. Grayscale only, system fonts, one readable column.
+   Type: one size for all body text (1.0625rem), one per heading level. Secondary text is grey, not smaller. */
 
 /* Theme: follows the system until the visitor uses the toggle (theme.js sets data-theme). */
 :root { --text: #111; --muted: #5c5c5c; --rule: #d9d9d9; --bg: #fff; --light-only: block; --dark-only: none; color-scheme: light; }
@@ -42,31 +43,33 @@ header nav a::after { content: attr(data-label); font-weight: 600; height: 0; ov
 header nav a[aria-current="page"] { text-decoration: none; font-weight: 600; }
 
 /* Pushed to the right end of the navigation row; on phones it simply follows the last link. */
-.theme-toggle { margin-left: auto; font: inherit; font-size: 0.9375rem; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; white-space: nowrap; }
+.theme-toggle { margin-left: auto; font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; white-space: nowrap; }
 .theme-toggle:hover { color: var(--text); text-decoration-thickness: 2px; }
 
 h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.75rem; }
-h2 { font-size: 1.15rem; margin: 3rem 0 1rem; }
-h3 { font-size: 1rem; margin: 0; }
+h2 { font-size: 1.25rem; margin: 3rem 0 1rem; }
+h3 { font-size: 1.0625rem; margin: 0; }
 p, ul, ol { margin: 0 0 1rem; }
+/* Browsers shrink monospace text by default; keep code at the body size. */
+code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1em; }
+pre { overflow-x: auto; }
 ul, ol { padding-left: 1.25rem; }
 li { margin-bottom: 0.35rem; }
 
-.lead { font-size: 1.2rem; }
 .muted, .meta { color: var(--muted); }
-.meta { font-size: 0.9375rem; margin: 0.1rem 0 0.4rem; }
+.meta { margin: 0.1rem 0 0.4rem; }
 .entry { margin-bottom: 2rem; }
 
 .table { overflow-x: auto; margin: 0 0 1.5rem; }
 figure .table { margin: 0; }
-table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+table { border-collapse: collapse; width: 100%; }
 th, td { text-align: left; vertical-align: top; padding: 0.4rem 0.75rem 0.4rem 0; border-bottom: 1px solid var(--rule); }
 
 /* Figures fill the column; wide ones (plots) extend up to 60rem so their labels stay readable. */
 figure { margin: 2rem 0; }
 figure img { display: block; width: 100%; height: auto; }
 figure.wide { margin-inline: calc(50% - min(30rem, 50vw - 1.25rem)); }
-figcaption { max-width: 37.5rem; margin: 0.5rem auto 0; font-size: 0.9375rem; color: var(--muted); }
+figcaption { max-width: 37.5rem; margin: 0.5rem auto 0; color: var(--muted); }
 .light-only { display: var(--light-only); }
 .dark-only { display: var(--dark-only); }
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
@@ -77,10 +80,10 @@ td.num { white-space: nowrap; }
 .pager a { text-decoration: none; }
 .pager a span:last-child { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
 .pager a:hover span:last-child { text-decoration-thickness: 2px; }
-.pager .label { display: block; font-size: 0.9375rem; color: var(--muted); }
+.pager .label { display: block; color: var(--muted); }
 .pager .next { grid-column: 2; text-align: right; }
 
-footer { margin-top: 4.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 0.9375rem; color: var(--muted); }
+footer { margin-top: 4.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--muted); }
 
 /* Phones: a smaller sticky header so it doesn't take over the screen. */
 @media (max-width: 30rem) {

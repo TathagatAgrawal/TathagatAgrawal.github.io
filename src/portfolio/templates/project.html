@@ -2,7 +2,7 @@
 {% block content %}
   <p class="meta"><a href="/projects/">Projects</a> / <a href="/projects/#{{ category.id }}">{{ category.name }}</a></p>
   <h1>{{ p.data.title }}</h1>
-  <p class="lead">{{ inline(p.data.website.summary) }}</p>
+  <p>{{ inline(p.data.website.summary) }}</p>
   <p class="meta">
     {{- month(p.data.date) }} &middot; {{ p.data.website.status }} &middot;
     {% if source %}<a href="{{ source }}">Source on GitHub</a>{% elif p.data.repository %}Private repository, walkthrough on request{% endif %}
