@@ -1,0 +1,8 @@
+{# A project in a list: title (linked to its page), year and status, summary. #}
+{% macro project_entry(p) -%}
+  <div class="entry">
+    <h3>{% if p.page %}<a href="/projects/{{ p.key }}/">{{ p.data.title }}</a>{% else %}{{ p.data.title }}{% endif %}</h3>
+    <p class="meta">{{ year(p.data.date) }}{% if p.data.website.status != "Complete" %} &middot; {{ p.data.website.status }}{% endif %}{% if not p.visible %} &middot; <strong>hidden</strong>{% endif %}</p>
+    <p>{{ inline(p.data.website.summary) }}</p>
+  </div>
+{%- endmacro %}

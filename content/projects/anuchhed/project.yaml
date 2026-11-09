@@ -1,0 +1,24 @@
+title: "Anuchhed: citation-first Q&A over the Constitution of India"
+date: 2026-11
+category: llm
+repository: constitution-rag
+private: true
+skills: [rag, embeddings, llm-evaluation, langgraph, llm-apis, prompt-engineering, fastapi, databases, web-frontend, python]
+
+website:
+  summary: >-
+    Ask anything about the Constitution of India and every statement in the answer cites the exact
+    Article, clause or amendment it comes from, with quotes verified against the official text.
+  result: >-
+    On a 70-question development set, 97% of answers behaved correctly (against 87% when the same
+    model answered from memory and 71% for naive RAG), and every quote shown matched the official
+    text exactly.
+  status: In progress
+  featured: true
+
+resume:
+  tech: Python, LangGraph, FastAPI, Gemini API, Qwen3 embeddings, SQLite FTS5
+  bullets:
+    - 'Built *citation-first Q&A* over the Constitution of India: the official PDF parsed into a provision tree with amendment history, and *hybrid retrieval* (reference lookup, BM25, dense embeddings, cross-encoder reranking) chosen through an eight-configuration ablation.'
+    - Every statement cites its provision and every quote is *verified against the official text*; on a 70-question development set, 97% correct behaviour versus 87% answering from memory and 71% for naive RAG, with 100% exact quotes.
+  short: citation-first RAG over the Constitution of India with verified quotes

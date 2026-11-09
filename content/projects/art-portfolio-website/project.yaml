@@ -1,0 +1,13 @@
+title: Art portfolio website
+date: 2026-01
+category: tools
+repository: mummy-art-webiste
+private: true
+skills: [web-frontend, javascript]
+
+website:
+  summary: >-
+    A minimalist website for an artist to show their work: a gallery, a page per artwork with
+    details and price, and an about page, in plain HTML, CSS and JavaScript.
+  status: Complete
+  hidden: true

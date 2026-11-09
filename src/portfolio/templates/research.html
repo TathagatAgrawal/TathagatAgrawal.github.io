@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Research</h1>
+  <p>Peer-reviewed papers, most recent first. My master's research studied grokking: when a network suddenly generalises long after it has memorised its training data, and what that does to transfer learning.</p>
+
+  <h2>Publications</h2>
+  {%- for pub, project in publications %}
+  <div class="entry">
+    <h3>{% if pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %}</h3>
+    <p class="meta">{{ pub.authors|join(", ") }} &middot; {{ venue(pub.venue) }}, {{ pub.year }}{% if project %} &middot; <a href="/projects/{{ project.key }}/">project page</a>{% endif %}</p>
+    {%- if pub.website.summary %}
+    <p>{{ inline(pub.website.summary) }}</p>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+
+  {%- if theses %}
+  <h2>Thesis</h2>
+  {%- for e, project in theses %}
+  <p><em>{{ e.data.thesis }}</em> <span class="muted">&middot; {{ e.data.role }}, {{ e.data.organisation }}, {{ year(e.data.end) }}</span>{% if project %} &middot; <a href="/projects/{{ project.key }}/">project page</a>{% endif %}</p>
+  {%- endfor %}
+  {%- endif %}
+{% endblock %}

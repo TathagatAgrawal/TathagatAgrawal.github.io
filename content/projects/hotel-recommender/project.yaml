@@ -1,0 +1,20 @@
+title: Hotel recommendation system
+date: 2022-01
+category: ml
+repository: hotel_recommendation_system
+skills: [nlp, pandas, data-cleaning, python]
+
+website:
+  summary: >-
+    Describe your trip in plain words and get the ten European hotels whose guest reviews best
+    match it, using 515,000 reviews of 1,493 hotels.
+  status: Complete
+  hidden: true
+
+resume:
+  title: Hotel Recommendation System
+  tech: Python, pandas, NLTK
+  bullets:
+    - Built a content-based hotel recommender over 515,000 reviews of 1,493 European hotels that matches a natural-language trip description to hotels' aggregated review tags.
+    - Used NLTK preprocessing (tokenization, stop-word removal, lemmatization) and a transparent set-intersection similarity for fast, explainable recommendations.
+  short: content-based hotel recommender over 515,000 reviews

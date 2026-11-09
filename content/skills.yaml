@@ -1,0 +1,171 @@
+# Skills.
+#
+# `groups` is the website's Skills page. Each skill has an id; projects and jobs list the ids they
+# used in their own `skills:` field, and the Skills page links every skill to that work
+# automatically. A skill nobody lists is shown without links.
+#
+# `resume` is the resume's "Technical Skills" section: free-text lines, with replacements per resume.
+
+groups:
+  - id: llm
+    name: LLMs and generative AI
+    skills:
+      - id: rag
+        name: Retrieval-augmented generation
+      - id: llm-evaluation
+        name: LLM and agent evaluation
+      - id: agents
+        name: Agents and tool calling
+      - id: langgraph
+        name: LangGraph
+      - id: langchain
+        name: LangChain
+      - id: embeddings
+        name: Embeddings and vector search
+      - id: fine-tuning
+        name: Fine-tuning (SFT, LoRA)
+      - id: llm-apis
+        name: LLM APIs (Gemini, OpenAI, OpenRouter)
+      - id: prompt-engineering
+        name: Prompt engineering
+
+  - id: ml
+    name: Machine learning
+    skills:
+      - id: experiment-design
+        name: Experiment design and honest validation
+      - id: learning-to-rank
+        name: Learning to rank
+      - id: ner
+        name: Named entity recognition
+      - id: nlp
+        name: Classic NLP (NLTK, spaCy)
+      - id: pytorch
+        name: PyTorch
+      - id: tensorflow-keras
+        name: TensorFlow and Keras
+      - id: hugging-face
+        name: Hugging Face Transformers
+      - id: scikit-learn
+        name: scikit-learn
+      - id: gradient-boosting
+        name: Gradient boosting (LightGBM, XGBoost)
+      - id: calibration
+        name: Probability calibration
+      - id: shap
+        name: Explainability with SHAP
+      - id: optuna
+        name: Hyperparameter search with Optuna
+      - id: mlflow
+        name: Experiment tracking with MLflow
+      - id: computer-vision
+        name: Computer vision (CNNs, segmentation)
+      - id: dl-research
+        name: Deep learning research (training dynamics, loss landscapes)
+
+  - id: quant
+    name: Quantitative finance
+    skills:
+      - id: backtesting
+        name: Backtesting engines and execution modelling
+      - id: market-data
+        name: Market data (yfinance, CCXT, NSE)
+      - id: risk-metrics
+        name: Performance and risk metrics (Sharpe, drawdown, deflated Sharpe)
+
+  - id: eng
+    name: Software engineering
+    skills:
+      - id: fastapi
+        name: Web APIs with FastAPI
+      - id: flask
+        name: Flask
+      - id: pydantic
+        name: Data validation with Pydantic
+      - id: databases
+        name: SQL databases (PostgreSQL, SQLite)
+      - id: testing
+        name: Testing and CI (pytest, GitHub Actions)
+      - id: web-frontend
+        name: Web front ends (HTML, CSS, JavaScript)
+      - id: desktop-apps
+        name: Packaged desktop apps for Windows and macOS
+      - id: cli-tui
+        name: Command-line and terminal apps (Typer, Rich, Textual)
+      - id: documents
+        name: Document generation (Typst, LaTeX)
+      - id: algorithms
+        name: Data structures and algorithms
+
+  - id: data
+    name: Data
+    skills:
+      - id: pandas
+        name: pandas and NumPy
+      - id: data-cleaning
+        name: Data cleaning and pipelines
+      - id: visualisation
+        name: Visualisation (Matplotlib, Seaborn, Power BI)
+      - id: excel
+        name: Excel reporting
+
+  - id: languages
+    name: Languages
+    skills:
+      - id: python
+        name: Python
+      - id: javascript
+        name: JavaScript
+      - id: cpp
+        name: C and C++
+      - id: java
+        name: Java
+      - id: r
+        name: R
+
+resume:
+  # Used by the ML resume, and by any resume without its own lines below.
+  default:
+    - label: Languages
+      skills: Python, C/C++, Java, JavaScript, R
+    - label: ML & Deep Learning
+      skills: PyTorch, TensorFlow, Keras, Scikit-Learn, HuggingFace Transformers, OpenCV, MLflow, XGBoost
+    - label: LLMs & NLP
+      skills: LangChain, LLaMA-Factory, OpenAI API, spaCy, NLTK
+    - label: Deployment & APIs
+      skills: FastAPI, Flask, REST APIs, Azure ML
+    - label: Data & Visualisation
+      skills: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel
+    - label: Developer and Agentic Tools
+      skills: Git, GitHub, Claude Code, Cursor, LaTeX
+  variants:
+    quant:
+      - label: Languages
+        skills: Python, C/C++, Java, JavaScript, R
+      - label: ML & Deep Learning
+        skills: PyTorch, TensorFlow, Keras, Scikit-Learn, HuggingFace Transformers, OpenCV, MLflow, XGBoost
+      - label: LLMs & NLP
+        skills: LangChain, LLaMA-Factory, OpenAI API, spaCy, NLTK
+      - label: Deployment & APIs
+        skills: FastAPI, Flask, REST APIs, Azure ML
+      - label: Data & Visualisation
+        skills: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel
+      - label: Developer Tools
+        skills: Git, GitHub, Claude Code, Cursor, LaTeX
+    general:
+      - label: Languages and tools
+        skills: Python, C/C++, Java, JavaScript, R; Git, GitHub, Claude Code, Cursor, LaTeX
+      - label: Generative AI and LLMs
+        skills: >-
+          LLM fine-tuning (SFT, LoRA), Retrieval-Augmented Generation (RAG), embeddings and vector
+          search (ChromaDB, Sentence-Transformers), prompt engineering, agentic AI and tool calling
+          (LangGraph, LangChain, ReAct), LLM evaluation, hallucination mitigation, OpenAI and Gemini
+          APIs, LLaMA-Factory
+      - label: ML and Deep Learning
+        skills: >-
+          PyTorch, TensorFlow, Keras, Scikit-Learn, XGBoost, HuggingFace Transformers,
+          learning-to-rank, NER, SHAP, OpenCV, spaCy, NLTK
+      - label: Deployment and MLOps
+        skills: FastAPI, Flask, REST APIs, Pydantic validation, MLflow, Azure ML, model monitoring
+      - label: Data and Visualisation
+        skills: Pandas, NumPy, data pipelines and feature engineering, Matplotlib, Seaborn, Power BI, Excel

@@ -1,0 +1,15 @@
+# Private material: phone number, address, cover letters, application notes, tailored resumes.
+# Never committed. The build also refuses to run if anything in here is tracked.
+private/
+
+# Build output and generated PDFs (the published resume is built by GitHub Actions).
+_site/
+*.pdf
+
+# Python
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+
+.DS_Store

@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+  <p class="meta"><a href="/projects/">Projects</a> / {{ category.name }}</p>
+  <h1>{{ p.data.title }}</h1>
+  <p class="lead">{{ inline(p.data.website.summary) }}</p>
+  <p class="meta">
+    {{- month(p.data.date) }} &middot; {{ p.data.website.status }} &middot;
+    {% if source %}<a href="{{ source }}">Source on GitHub</a>{% elif p.data.repository %}Private repository, walkthrough on request{% endif %}
+    {%- for l in p.data.links %} &middot; <a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}
+    {%- if not p.visible %} &middot; <strong>Hidden from the published site</strong>{% endif %}</p>
+  {%- if p.data.website.result %}
+  <p><strong>Result:</strong> {{ inline(p.data.website.result) }}</p>
+  {%- endif %}
+
+  {{ body }}
+
+  {%- if built_with %}
+  <h2>Built with</h2>
+  <p>{% for sid, name in built_with %}<a href="/skills/#{{ sid }}">{{ name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+  {%- endif %}
+
+  <nav class="pager" aria-label="More projects">
+    {% if prev %}<a href="/projects/{{ prev.key }}/">&larr; {{ prev.data.title }}</a>{% else %}<a href="/projects/">&larr; All projects</a>{% endif %}
+    {% if next %}<a href="/projects/{{ next.key }}/">{{ next.data.title }} &rarr;</a>{% else %}<a href="/projects/">All projects &rarr;</a>{% endif %}
+  </nav>
+{% endblock %}

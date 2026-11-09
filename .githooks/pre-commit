@@ -1,0 +1,4 @@
+#!/bin/sh
+# Refuse to commit if the content is broken or a phone number would be committed.
+# Enable once per clone with:  git config core.hooksPath .githooks
+exec uv run --quiet build --check

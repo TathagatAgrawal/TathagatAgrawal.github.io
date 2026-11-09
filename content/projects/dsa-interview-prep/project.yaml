@@ -1,0 +1,13 @@
+title: Data structures and algorithms practice
+date: 2026-09
+category: practice
+repository: dsa
+private: true
+skills: [algorithms, python]
+
+website:
+  summary: >-
+    A structured interview-preparation course: 18 topics, each with a concept note and real
+    LeetCode problems as runnable Python files with built-in tests.
+  status: In progress
+  hidden: true

@@ -1,0 +1,26 @@
+# Website settings.
+
+title: Tathagat Agrawal
+description: Applied ML scientist building LLM, retrieval and ranking systems, and measuring them honestly.
+url: https://tathagatagrawal.github.io
+
+# Project groups on the Projects page, in display order. Each project's `category` is one of these ids.
+categories:
+  - id: llm
+    name: LLMs and retrieval
+  - id: quant
+    name: Quantitative finance
+  - id: tools
+    name: Software for everyday use
+  - id: ml
+    name: Deep learning and classic ML
+  - id: research
+    name: Research
+  - id: practice
+    name: Practice and small programs
+
+# How many projects can have `featured: true` (they appear on the home page).
+featured_count: 3
+
+# The resume file in resume/ that is published as /resume.pdf.
+published_resume: general

@@ -1,0 +1,19 @@
+title: Invoice Generator
+date: 2026-10
+category: tools
+repository: invoice-generator
+private: true
+skills: [documents, fastapi, pydantic, web-frontend, testing, python]
+
+website:
+  summary: >-
+    A web app for professional invoices: nine templates, correct tax handling, and a live preview
+    that is the real PDF layout, rendered by Typst as you type.
+  status: MVP complete
+
+resume:
+  tech: Python, FastAPI, Typst, Pydantic, JavaScript
+  bullets:
+    - Built an *invoice web app* with a live preview that is the real PDF, rendered by *Typst* as you type; nine templates with safe customisation and archival PDF/A-2b output with embedded fonts.
+    - Implemented an exact-decimal *calculation engine* (per-line discounts, multiple tax rates such as CGST + SGST, tax-inclusive pricing, rounding rules) and locale-aware formatting, tested against every template and edge case in CI.
+  short: invoice web app with Typst-rendered live PDF preview and an exact tax engine

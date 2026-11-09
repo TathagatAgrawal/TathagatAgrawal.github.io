@@ -1,0 +1,21 @@
+title: Legal document Q&A with RAG
+date: 2025-07
+category: llm
+repository: RAG_DSL
+skills: [rag, embeddings, langchain, llm-apis, prompt-engineering, python]
+
+website:
+  summary: >-
+    Ingests a legal PDF, extracts its key concepts, generates question-answer pairs about them, and
+    answers natural-language questions from a command line.
+  status: Complete
+
+resume:
+  title: RAG-Based Legal AI Assistant
+  tech: LangChain, Sentence-Transformers, OpenRouter, Python
+  bullets:
+    - Built a RAG-based legal-AI agent using LangChain and HuggingFace embedding models to answer questions about legal documents.
+    - Developed LLM prompt templates to extract top legal concepts and automatically generate focused Q\&A pairs.
+    - Created dual in-memory vector stores, one for source chunks and one for Q\&A pairs, enabling fast cosine-similarity searches.
+    - Built a CLI that orchestrates retrieval, LLM inference, and response delivery with logging and a "not legal advice" disclaimer.
+  short: RAG assistant for legal PDFs with generated Q&A pairs as a second index

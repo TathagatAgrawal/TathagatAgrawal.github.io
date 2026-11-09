@@ -1,0 +1,68 @@
+/* The whole stylesheet. Grayscale only, system fonts, one readable column. */
+
+/* Theme: follows the system unless the visitor picks Light or Dark (theme.js sets data-theme). */
+:root { --text: #111; --muted: #5c5c5c; --rule: #d9d9d9; --bg: #fff; --light-only: block; --dark-only: none; color-scheme: light; }
+:root[data-theme="dark"] { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; color-scheme: dark; }
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; color-scheme: dark; }
+}
+
+* { box-sizing: border-box; }
+html { overflow-x: clip; }
+
+body {
+  max-width: 40rem;            /* ~70 characters per line */
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 4rem;
+  font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+
+header { margin-bottom: 3.5rem; }
+header .top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.25rem; }
+header .name { font-weight: 600; text-decoration: none; }
+
+.theme { font-size: 0.9375rem; color: var(--muted); white-space: nowrap; }
+.theme button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin-left: 0.6rem; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; }
+.theme button[aria-pressed="true"] { color: var(--text); font-weight: 600; text-decoration: none; }
+nav a { margin-right: 0.9rem; white-space: nowrap; }
+nav a:last-child { margin-right: 0; }
+nav a[aria-current="page"] { text-decoration: none; font-weight: 600; }
+
+h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.75rem; }
+h2 { font-size: 1.15rem; margin: 3rem 0 1rem; }
+h3 { font-size: 1rem; margin: 0; }
+p, ul, ol { margin: 0 0 1rem; }
+ul, ol { padding-left: 1.25rem; }
+li { margin-bottom: 0.35rem; }
+
+.lead { font-size: 1.2rem; }
+.muted, .meta { color: var(--muted); }
+.meta { font-size: 0.9375rem; margin: 0.1rem 0 0.4rem; }
+.entry { margin-bottom: 2rem; }
+
+.table { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
+th, td { text-align: left; vertical-align: top; padding: 0.4rem 0.75rem 0.4rem 0; border-bottom: 1px solid var(--rule); }
+
+/* Figures fill the column; wide ones (plots) extend up to 60rem so their labels stay readable. */
+figure { margin: 2rem 0; }
+figure img { display: block; width: 100%; height: auto; }
+figure.wide { margin-inline: calc(50% - min(30rem, 50vw - 1.25rem)); }
+figcaption { max-width: 37.5rem; margin: 0.5rem auto 0; font-size: 0.9375rem; color: var(--muted); }
+.light-only { display: var(--light-only); }
+.dark-only { display: var(--dark-only); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+td.num { white-space: nowrap; }
+
+.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; margin-top: 3rem; }
+
+footer { margin-top: 4.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 0.9375rem; color: var(--muted); }
+
+@media print { header nav, .theme, footer, .pager { display: none; } body { max-width: none; } }

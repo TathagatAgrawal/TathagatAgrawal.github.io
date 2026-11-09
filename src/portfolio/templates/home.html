@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% from "macros.html" import project_entry %}
+{% block content %}
+  <h1>{{ profile.website.headline }}</h1>
+  <div class="lead">{{ block(profile.website.intro) }}</div>
+  {{ block(profile.website.status) }}
+
+  {%- if featured %}
+  <h2>Selected projects</h2>
+  {% for p in featured %}{{ project_entry(p) }}
+  {% endfor %}
+  <p><a href="/projects/">All {{ project_count }} projects &rarr;</a></p>
+  {%- endif %}
+
+  <h2>Experience</h2>
+  {%- for e in work[:1] %}
+  <div class="entry">
+    <h3>{{ e.data.role }}, {{ e.data.organisation }}</h3>
+    <p class="meta">{{ daterange(e.data.start, e.data.end) }}</p>
+    {%- if e.data.website and e.data.website.summary %}
+    <p>{{ inline(e.data.website.summary) }}</p>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+  <p><a href="/experience/">Full experience and education &rarr;</a></p>
+
+  {%- if publications %}
+  <h2>Research</h2>
+  <ul>
+    {%- for pub in publications %}
+    <li>{% if pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %} <span class="muted">&middot; {{ venue(pub.venue) }}, {{ pub.year }}</span></li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+{% endblock %}

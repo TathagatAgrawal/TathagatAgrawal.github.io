@@ -1,0 +1,18 @@
+type: work
+role: Business Analyst Intern
+organisation: Finlatics – NITI Aayog, Govt. of India
+location: Remote
+start: 2024-05
+end: 2024-05
+skills: [data-cleaning, python, excel]
+
+website:
+  bullets:
+    - Automated data-cleaning pipelines with Python scripts, significantly reducing processing time.
+    - Ran case studies on data-driven decision making and prepared reporting for senior leadership.
+
+resume:
+  bullets:
+    - Conducted case studies on data-driven decision-making.
+    - Automated data cleaning pipelines with Python scripts, significantly reducing processing time.
+    - Facilitated data-driven reporting to senior leadership.

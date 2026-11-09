@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Experience</h1>
+  <p>Where I've worked and studied. The same information, condensed to one page, is in my <a href="/resume.pdf">resume (PDF)</a>.</p>
+
+  <h2>Work</h2>
+  {%- for e in work %}
+  <div class="entry" id="{{ e.key }}">
+    <h3>{{ e.data.role }}, {{ e.data.organisation }}</h3>
+    <p class="meta">{{ daterange(e.data.start, e.data.end) }}{% if e.data.location %} &middot; {{ e.data.location }}{% endif %}</p>
+    {%- if e.data.website and e.data.website.bullets %}
+    <ul>
+      {%- for b in e.data.website.bullets %}
+      <li>{{ inline(b) }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+
+  <h2>Education</h2>
+  {%- for e in education %}
+  <div class="entry" id="{{ e.key }}">
+    <h3>{{ e.data.role }}, {{ e.data.organisation }}</h3>
+    <p class="meta">{{ daterange(e.data.start, e.data.end) }}{% if e.data.grade %} &middot; {{ e.data.grade }}{% endif %}</p>
+    {%- if e.data.website and e.data.website.bullets %}
+    <ul>
+      {%- for b in e.data.website.bullets %}
+      <li>{{ inline(b) }}</li>
+      {%- endfor %}
+    </ul>
+    {%- endif %}
+  </div>
+  {%- endfor %}
+
+  {%- if certifications %}
+  <h2>Certifications</h2>
+  <ul>
+    {%- for c in certifications %}
+    <li>{% if c.url %}<a href="{{ c.url }}">{{ c.title }}</a>{% else %}{{ c.title }}{% endif %} <span class="muted">&middot; {{ c.issuer }}, {{ year(c.date) }}</span></li>
+    {%- endfor %}
+  </ul>
+  {%- endif %}
+{% endblock %}

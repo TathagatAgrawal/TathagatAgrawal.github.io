@@ -1,0 +1,13 @@
+title: "Study notes: Mathematics for Deep Learning"
+date: 2026-08
+category: practice
+repository: study
+private: true
+skills: [documents, pytorch, python]
+
+website:
+  summary: >-
+    A short book I wrote while studying: linear algebra, calculus and probability for deep
+    learning, with derivations and PyTorch examples, plus notes on transformers and prompting.
+  status: Ongoing
+  hidden: true

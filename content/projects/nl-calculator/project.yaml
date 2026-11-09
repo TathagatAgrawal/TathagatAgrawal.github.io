@@ -1,0 +1,12 @@
+title: Natural-language calculator
+date: 2026-08
+category: llm
+repository: nl-calculator
+skills: [agents, langchain, llm-apis, pydantic, cli-tui, python]
+
+website:
+  summary: >-
+    Type "add 5 and 3, then multiply by 2": an LLM parses the request, calls exact arithmetic
+    tools, and answers in plain language.
+  status: Complete
+  hidden: true

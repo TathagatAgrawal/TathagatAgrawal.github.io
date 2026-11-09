@@ -1,0 +1,13 @@
+title: Algorithmic trading notes and experiments
+date: 2025-09
+category: quant
+repository: algo_trading
+private: true
+skills: [market-data, pandas, documents, python]
+
+website:
+  summary: >-
+    A concise written overview of algorithmic trading (strategies, the maths behind them, risk and
+    evaluation) and a first notebook of experiments on Indian stocks.
+  status: Notes
+  hidden: true

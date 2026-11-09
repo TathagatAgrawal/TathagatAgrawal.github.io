@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% from "macros.html" import project_entry %}
+{% block content %}
+  <h1>Projects</h1>
+  <p>Things I've built outside work, newest first within each group. Each one has a page explaining the problem, what I built, and what came out of it.</p>
+  {%- if groups|length > 1 %}
+  <p class="muted">Jump to: {% for c, items in groups %}<a href="#{{ c.id }}">{{ c.name }}</a>{% if not loop.last %} &middot; {% endif %}{% endfor %}</p>
+  {%- endif %}
+  {% for c, items in groups %}
+  <h2 id="{{ c.id }}">{{ c.name }}</h2>
+  {% for p in items %}{{ project_entry(p) }}
+  {% endfor %}
+  {%- endfor %}
+{% endblock %}

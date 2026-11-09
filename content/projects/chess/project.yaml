@@ -1,0 +1,11 @@
+title: Chess
+date: 2026-02
+category: practice
+repository: chess
+private: true
+skills: [python]
+
+website:
+  summary: A two-player chess game with a graphical board, built around a clean object-oriented model of the board and pieces.
+  status: Complete
+  hidden: true

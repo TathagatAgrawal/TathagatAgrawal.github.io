@@ -1,0 +1,7 @@
+## The idea
+
+Tax calculators give a number but rarely show why. This engine will take a structured JSON description of a taxpayer's case for assessment year 2026-27 (financial year 2025-26) and return a JSON answer in which every figure is traceable to the rule and section of the Income-tax Act that produced it.
+
+## Status
+
+Only the project scaffold exists so far; the engine itself is not built yet.

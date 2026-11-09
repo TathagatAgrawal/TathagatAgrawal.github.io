@@ -1,0 +1,19 @@
+title: ITR Fetch
+date: 2026-11
+category: tools
+repository: computax-client-file-download
+skills: [desktop-apps, web-frontend, javascript, testing, python]
+
+website:
+  summary: >-
+    A desktop tool for tax practitioners who use CompuTax: finds a client's returns and tax
+    computations across years and copies them into one folder, with nothing to install.
+  status: Released for Windows and macOS
+
+resume:
+  title: ITR Fetch
+  tech: Python, JavaScript, PyInstaller, GitHub Actions
+  bullets:
+    - Built a *desktop tool for a tax practice* that finds a client's returns and computations across years in CompuTax data folders and copies them into one folder per client, never overwriting or modifying source files.
+    - Shipped it as standalone Windows and macOS apps with a local browser interface and fuzzy client search, built and released automatically by GitHub Actions.
+  short: one-click desktop tool that collects a client's tax documents across years

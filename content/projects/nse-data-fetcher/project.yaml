@@ -1,0 +1,18 @@
+title: NSE Data Fetcher
+date: 2026-09
+category: tools
+repository: nse-data-fetcher
+skills: [desktop-apps, market-data, excel, testing, python]
+
+website:
+  summary: >-
+    A desktop app that downloads historical price data for Indian stocks and indices into Excel,
+    one sheet per symbol, with no coding required.
+  status: Released for Windows and macOS
+
+resume:
+  tech: Python, CustomTkinter, yfinance, openpyxl, PyInstaller
+  bullets:
+    - Built a desktop app that downloads historical OHLCV data for Indian stocks and indices (single symbols, index constituents or pasted lists) into Excel workbooks, one sheet per symbol.
+    - Packaged it as standalone Windows and macOS apps released automatically by GitHub Actions, with bundled symbol lists as a fallback when NSE's live endpoints are unavailable.
+  short: desktop app that downloads Indian market data to Excel

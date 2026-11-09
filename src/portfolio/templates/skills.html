@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Skills</h1>
+  <p>Each skill is followed by the work where I used it, so you can see it in practice rather than take my word for it.</p>
+  <p class="muted">Jump to: {% for g in groups %}<a href="#{{ g.id }}">{{ g.name }}</a>{% if not loop.last %} &middot; {% endif %}{% endfor %}</p>
+  {% for g in groups %}
+  <h2 id="{{ g.id }}">{{ g.name }}</h2>
+  <ul>
+    {%- for s in g.skills %}
+    <li id="{{ s.id }}"><strong>{{ s.name }}</strong>{% if evidence[s.id] %} <span class="muted">&middot; {% for href, label in evidence[s.id] %}<a href="{{ href }}">{{ label }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</span>{% endif %}</li>
+    {%- endfor %}
+  </ul>
+  {%- endfor %}
+{% endblock %}

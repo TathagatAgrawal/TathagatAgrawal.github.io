@@ -1,0 +1,25 @@
+title: "Clinic Agent: AI-assisted appointment scheduling"
+date: 2026-10
+category: llm
+repository: clinic-agent
+private: true
+skills: [embeddings, scikit-learn, calibration, experiment-design, llm-apis, prompt-engineering, llm-evaluation, fastapi, databases, testing, web-frontend, python]
+
+website:
+  summary: >-
+    Patients describe their concern and get real appointment options with a suitable doctor. AI
+    assists with intake and routing; deterministic code owns safety and booking, and everything
+    works with the LLM switched off.
+  result: >-
+    On 218 held-out cases, the trained department classifier chose an acceptable department 97.2%
+    of the time with no wrong-specialist choices, against 85.3% and 8 wrong specialists for the
+    hand-tuned router it replaced.
+  status: Complete (version 1)
+
+resume:
+  tech: Python, FastAPI, PostgreSQL, scikit-learn, fastembed, Gemini API
+  bullets:
+    - 'Built a clinic scheduling system where *AI assists but never decides*: LLM intake summaries and a trained department router, with deterministic code owning red-flag safety checks, availability and booking; the full flow works with the LLM off.'
+    - Replaced a hand-tuned similarity router with a *calibrated classifier* on local embeddings; on 218 held-out cases it chose an acceptable department *97.2% vs 85.3%*, with *0 vs 8* wrong-specialist routings.
+    - Hardened the app for real use (Argon2id passwords, CSRF protection, rate limits, append-only audit log, identifier scrubbing before any LLM call) with tests for concurrent bookings and authorization on every route.
+  short: AI-assisted clinic scheduling with a calibrated department router (97.2% acceptable on held-out cases)

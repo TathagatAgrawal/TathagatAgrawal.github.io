@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{% block title %}{{ page_title }}{% endblock %}</title>
+<meta name="description" content="{{ description }}">
+<link rel="canonical" href="{{ site.url }}{{ path }}">
+<meta property="og:type" content="website">
+<meta property="og:title" content="{{ page_title }}">
+<meta property="og:description" content="{{ description }}">
+<meta property="og:url" content="{{ site.url }}{{ path }}">
+<link rel="stylesheet" href="/style.css">
+<script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
+</head>
+<body>
+
+<header>
+  <div class="top">
+    <a class="name" href="/">{{ profile.name }}</a>
+    <div class="theme" role="group" aria-label="Colour theme" hidden><button type="button" value="auto">Auto</button><button type="button" value="light">Light</button><button type="button" value="dark">Dark</button></div>
+  </div>
+  <nav>
+    {%- for href, label, key in nav %}
+    <a href="{{ href }}"{% if key == section %} aria-current="page"{% endif %}>{{ label }}</a>
+    {%- endfor %}
+  </nav>
+</header>
+
+<main>
+{%- if drafts %}
+  <p class="meta"><strong>Preview build:</strong> projects hidden from the published site are included and marked.</p>
+{%- endif %}
+{% block content %}{% endblock %}
+</main>
+
+<footer>
+  <a href="mailto:{{ profile.email }}">{{ profile.email }}</a> &middot;
+  <a href="{{ profile.links.github }}">GitHub</a> &middot;
+  <a href="{{ profile.links.linkedin }}">LinkedIn</a><br>
+  Last updated {{ updated }}
+</footer>
+
+<script src="/theme.js"></script>
+</body>
+</html>

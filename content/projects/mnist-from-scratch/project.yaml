@@ -1,0 +1,13 @@
+title: Neural network from scratch
+date: 2025-07
+category: ml
+repository: MNIST_from_scratch
+private: true
+skills: [python, pandas]
+
+website:
+  summary: >-
+    A neural network for MNIST digit recognition written with nothing but NumPy: forward pass,
+    backpropagation and training loop by hand.
+  status: Complete
+  hidden: true

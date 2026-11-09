@@ -1,0 +1,28 @@
+type: education
+role: Integrated M.Tech. in Artificial Intelligence
+organisation: VIT Bhopal University
+location: Bhopal
+start: 2020
+end: 2025
+grade: "CGPA: 9.1/10.0"
+thesis: Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings
+skills: [dl-research, pytorch]
+
+website:
+  project: grokking-thesis      # project page about the thesis, if shown
+  bullets:
+    - "Master's thesis: *Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings*, which led to two [publications](/research/)."
+
+resume:
+  title: Integrated M. Tech. in AI
+  # Used by the ML and quant resumes.
+  bullets:
+    - "*Relevant courses:* Applied ML, Computer Vision, NLP, Deep Learning, Hardware Acceleration for ML, Data Visualization, Big Data and Data Warehousing, Probability and Statistics, etc."
+    - text: "*Master's thesis:* _Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings_."
+      bullets:
+        - Designed and performed transfer learning experiments using MLP and Transformer models to study the effects of grokking on model flexibility using loss landscape visualization and Hessian eigenvalue analysis.
+        - See publications \[1\] and \[2\].
+  variants:
+    general:
+      bullets:
+        - "*Master's thesis:* _Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings_ (publications #link(\"https://doi.org/10.1007/s42979-025-04182-z\")[\\[1\\]], \\[2\\])."
