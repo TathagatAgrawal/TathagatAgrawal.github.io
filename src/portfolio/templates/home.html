@@ -28,7 +28,7 @@
   <h2>Research</h2>
   <ul>
     {%- for pub in publications %}
-    <li>{% if pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %} <span class="muted">&middot; {{ venue(pub.venue) }}, {{ pub.year }}</span></li>
+    <li>{% if pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %} <span class="muted">&middot; {{ venue(pub.venue) }}{% if pub.year|string not in pub.venue %}, {{ pub.year }}{% endif %}</span></li>
     {%- endfor %}
   </ul>
   {%- endif %}

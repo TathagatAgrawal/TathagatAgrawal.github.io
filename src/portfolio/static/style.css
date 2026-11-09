@@ -1,6 +1,6 @@
 /* The whole stylesheet. Grayscale only, system fonts, one readable column. */
 
-/* Theme: follows the system unless the visitor picks Light or Dark (theme.js sets data-theme). */
+/* Theme: follows the system until the visitor uses the toggle (theme.js sets data-theme). */
 :root { --text: #111; --muted: #5c5c5c; --rule: #d9d9d9; --bg: #fff; --light-only: block; --dark-only: none; color-scheme: light; }
 :root[data-theme="dark"] { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; color-scheme: dark; }
 
@@ -9,12 +9,13 @@
 }
 
 * { box-sizing: border-box; }
-html { overflow-x: clip; }
+/* scroll-padding keeps #anchor targets clear of the sticky header. */
+html { overflow-x: clip; scroll-padding-top: 7.5rem; }
 
 body {
   max-width: 40rem;            /* ~70 characters per line */
   margin: 0 auto;
-  padding: 2.5rem 1.25rem 4rem;
+  padding: 0 1.25rem 4rem;
   font: 1.0625rem/1.65 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   color: var(--text);
   background: var(--bg);
@@ -24,16 +25,25 @@ a { color: inherit; text-underline-offset: 0.2em; text-decoration-thickness: 1px
 a:hover { text-decoration-thickness: 2px; }
 :focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
 
-header { margin-bottom: 3.5rem; }
-header .top { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: 0.25rem; }
-header .name { font-weight: 600; text-decoration: none; }
+/* Sticky header. The box-shadow and clip-path extend its background to the window edges, so wide
+   figures never show through beside it. */
+header {
+  position: sticky; top: 0; z-index: 1;
+  padding: 1.5rem 0 0.75rem; margin-bottom: 3rem;
+  background: var(--bg); box-shadow: 0 0 0 100vmax var(--bg); clip-path: inset(0 -100vmax);
+  border-bottom: 1px solid var(--rule);
+}
+header .name { display: block; font-size: 1.5rem; font-weight: 700; line-height: 1.2; text-decoration: none; margin-bottom: 0.5rem; }
+header nav { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.15rem 0.9rem; }
+/* The current page is bold. Each link reserves the width of its bold text (the hidden ::after), so
+   switching pages never shifts the other links. */
+header nav a { display: inline-flex; flex-direction: column; white-space: nowrap; }
+header nav a::after { content: attr(data-label); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; user-select: none; }
+header nav a[aria-current="page"] { text-decoration: none; font-weight: 600; }
 
-.theme { font-size: 0.9375rem; color: var(--muted); white-space: nowrap; }
-.theme button { font: inherit; color: inherit; background: none; border: 0; padding: 0; margin-left: 0.6rem; cursor: pointer; text-decoration: underline; text-underline-offset: 0.2em; }
-.theme button[aria-pressed="true"] { color: var(--text); font-weight: 600; text-decoration: none; }
-nav a { margin-right: 0.9rem; white-space: nowrap; }
-nav a:last-child { margin-right: 0; }
-nav a[aria-current="page"] { text-decoration: none; font-weight: 600; }
+/* Pushed to the right end of the navigation row; on phones it simply follows the last link. */
+.theme-toggle { margin-left: auto; font: inherit; font-size: 0.9375rem; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; white-space: nowrap; }
+.theme-toggle:hover { color: var(--text); text-decoration-thickness: 2px; }
 
 h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.75rem; }
 h2 { font-size: 1.15rem; margin: 3rem 0 1rem; }
@@ -47,7 +57,8 @@ li { margin-bottom: 0.35rem; }
 .meta { font-size: 0.9375rem; margin: 0.1rem 0 0.4rem; }
 .entry { margin-bottom: 2rem; }
 
-.table { overflow-x: auto; }
+.table { overflow-x: auto; margin: 0 0 1.5rem; }
+figure .table { margin: 0; }
 table { border-collapse: collapse; width: 100%; font-size: 0.9375rem; }
 th, td { text-align: left; vertical-align: top; padding: 0.4rem 0.75rem 0.4rem 0; border-bottom: 1px solid var(--rule); }
 
@@ -61,8 +72,23 @@ figcaption { max-width: 37.5rem; margin: 0.5rem auto 0; font-size: 0.9375rem; co
 td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 td.num { white-space: nowrap; }
 
-.pager { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 0.5rem 1rem; margin-top: 3rem; }
+/* Previous and next each get half the width, so long titles wrap within their own side. */
+.pager { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); }
+.pager a { text-decoration: none; }
+.pager a span:last-child { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; }
+.pager a:hover span:last-child { text-decoration-thickness: 2px; }
+.pager .label { display: block; font-size: 0.9375rem; color: var(--muted); }
+.pager .next { grid-column: 2; text-align: right; }
 
 footer { margin-top: 4.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); font-size: 0.9375rem; color: var(--muted); }
 
-@media print { header nav, .theme, footer, .pager { display: none; } body { max-width: none; } }
+/* Phones: a smaller sticky header so it doesn't take over the screen. */
+@media (max-width: 30rem) {
+  html { scroll-padding-top: 9rem; }
+  header { padding-top: 1rem; margin-bottom: 2rem; }
+  header .name { font-size: 1.3rem; margin-bottom: 0.35rem; }
+  header nav { gap: 0.1rem 0.75rem; }
+  .theme-toggle { margin-left: 0; }
+}
+
+@media print { header { position: static; border: 0; } header nav, footer, .pager { display: none; } body { max-width: none; } }

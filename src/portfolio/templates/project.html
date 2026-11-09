@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block content %}
-  <p class="meta"><a href="/projects/">Projects</a> / {{ category.name }}</p>
+  <p class="meta"><a href="/projects/">Projects</a> / <a href="/projects/#{{ category.id }}">{{ category.name }}</a></p>
   <h1>{{ p.data.title }}</h1>
   <p class="lead">{{ inline(p.data.website.summary) }}</p>
   <p class="meta">
@@ -20,7 +20,11 @@
   {%- endif %}
 
   <nav class="pager" aria-label="More projects">
-    {% if prev %}<a href="/projects/{{ prev.key }}/">&larr; {{ prev.data.title }}</a>{% else %}<a href="/projects/">&larr; All projects</a>{% endif %}
-    {% if next %}<a href="/projects/{{ next.key }}/">{{ next.data.title }} &rarr;</a>{% else %}<a href="/projects/">All projects &rarr;</a>{% endif %}
+    {%- if prev %}
+    <a class="prev" href="/projects/{{ prev.key }}/" rel="prev"><span class="label">&larr; Previous</span> <span>{{ prev.data.title }}</span></a>
+    {%- endif %}
+    {%- if next %}
+    <a class="next" href="/projects/{{ next.key }}/" rel="next"><span class="label">Next &rarr;</span> <span>{{ next.data.title }}</span></a>
+    {%- endif %}
   </nav>
 {% endblock %}

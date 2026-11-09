@@ -1,29 +1,30 @@
-// Auto / Light / Dark switch. "Auto" follows the system; a choice is remembered in this browser.
-// The saved choice is applied by a one-line script in <head> so the page never flashes the wrong theme.
+// Light/dark toggle. Until the visitor clicks it, the site follows the system theme; after that the
+// choice is remembered in this browser. The saved choice is applied by a one-line script in <head>
+// so the page never flashes the wrong theme.
 (function () {
   var root = document.documentElement;
-  var control = document.querySelector('.theme');
-  if (!control) return;
+  var button = document.querySelector('.theme-toggle');
+  if (!button) return;
+  var systemDark = window.matchMedia('(prefers-color-scheme: dark)');
 
   function current() {
-    return root.dataset.theme || 'auto';
+    return root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
   }
 
-  function apply(choice) {
-    if (choice === 'auto') delete root.dataset.theme;
-    else root.dataset.theme = choice;
-    try {
-      if (choice === 'auto') localStorage.removeItem('theme');
-      else localStorage.setItem('theme', choice);
-    } catch (e) {}
-    control.querySelectorAll('button').forEach(function (b) {
-      b.setAttribute('aria-pressed', String(b.value === choice));
-    });
+  // The button names the theme it switches to.
+  function label() {
+    var dark = current() === 'dark';
+    button.textContent = dark ? 'Light mode' : 'Dark mode';
+    button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
   }
 
-  control.addEventListener('click', function (event) {
-    if (event.target.matches('button')) apply(event.target.value);
+  button.addEventListener('click', function () {
+    var next = current() === 'dark' ? 'light' : 'dark';
+    root.dataset.theme = next;
+    try { localStorage.setItem('theme', next); } catch (e) {}
+    label();
   });
-  control.hidden = false;
-  apply(current());
+  systemDark.addEventListener('change', label);
+  button.hidden = false;
+  label();
 })();

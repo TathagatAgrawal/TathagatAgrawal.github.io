@@ -16,14 +16,12 @@
 <body>
 
 <header>
-  <div class="top">
-    <a class="name" href="/">{{ profile.name }}</a>
-    <div class="theme" role="group" aria-label="Colour theme" hidden><button type="button" value="auto">Auto</button><button type="button" value="light">Light</button><button type="button" value="dark">Dark</button></div>
-  </div>
-  <nav>
+  <a class="name" href="/">{{ profile.name }}</a>
+  <nav aria-label="Main">
     {%- for href, label, key in nav %}
-    <a href="{{ href }}"{% if key == section %} aria-current="page"{% endif %}>{{ label }}</a>
+    <a href="{{ href }}" data-label="{{ label }}"{% if key == section %} aria-current="page"{% endif %}>{{ label }}</a>
     {%- endfor %}
+    <button class="theme-toggle" type="button" hidden>Dark mode</button>
   </nav>
 </header>
 
