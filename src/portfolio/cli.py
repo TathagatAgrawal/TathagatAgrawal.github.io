@@ -23,6 +23,8 @@ from .site import build_site
 
 ROOT = Path(__file__).resolve().parents[2]
 WATCHED = ["content", "resume", "src/portfolio"]
+# Where `uv run resume` also copies the PDFs unless told otherwise: a folder in iCloud Drive, so they reach a phone.
+DEFAULT_COPY_DIR = Path.home() / "Library" / "Mobile Documents" / "com~apple~CloudDocs" / "Resumes"
 
 
 def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True) -> bool:
@@ -249,6 +251,19 @@ def _write_resumes(
     return ok
 
 
+def resolve_copy_dir(copy_to: Path | None, no_copy: bool, default: Path = DEFAULT_COPY_DIR) -> Path | None:
+    """The folder resumes are copied to, or None for no copy.
+
+    --no-copy means none; --copy-to names a folder (an error later if its parent is missing). Otherwise the
+    default is used, but only when its parent exists, so a machine without iCloud Drive just skips the copy.
+    """
+    if no_copy:
+        return None
+    if copy_to is not None:
+        return copy_to.expanduser()
+    return default if default.parent.exists() else None
+
+
 def resume_main() -> None:
     """`uv run resume <name>`: build resumes from content/config.yaml into resume/ and, optionally, another folder."""
     try:
@@ -264,14 +279,14 @@ def resume_main() -> None:
     parser.add_argument(
         "--copy-to",
         type=Path,
-        default=os.environ.get("RESUME_COPY_DIR") or None,
         metavar="DIR",
-        help="also copy each PDF into DIR under its `filename` from config.yaml, e.g. a folder in iCloud Drive "
-        "(default: the RESUME_COPY_DIR environment variable)",
+        help="copy each PDF into DIR, under its `filename` from config.yaml, instead of the default folder "
+        f"({str(DEFAULT_COPY_DIR).replace(str(Path.home()), '~')})",
     )
+    parser.add_argument("--no-copy", action="store_true", help="only write resume/<name>.pdf; don't copy anywhere")
     parser.add_argument("--watch", action="store_true", help="rebuild the PDF on every save (for live preview)")
     args = parser.parse_args()
-    copy_dir = args.copy_to.expanduser() if args.copy_to else None
+    copy_dir = resolve_copy_dir(args.copy_to, args.no_copy)
 
     targets = names if args.name == "all" else [args.name]
     ok = _write_resumes(targets, args.out, copy_dir)

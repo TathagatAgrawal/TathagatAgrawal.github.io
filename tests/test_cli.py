@@ -77,3 +77,29 @@ def test_failed_content_check_keeps_the_previous_site(tmp_path: Path, monkeypatc
 def test_code_import_check_passes_for_the_real_package() -> None:
     """The check that guards the self-restart accepts the package as it is now."""
     assert cli._code_imports() is True
+
+
+def test_copy_folder_defaults_to_icloud_when_it_exists(tmp_path: Path) -> None:
+    """With no options the default folder is used if its parent exists, and skipped quietly if not."""
+    icloud = tmp_path / "CloudDocs"
+    default = icloud / "Resumes"
+    assert cli.resolve_copy_dir(None, False, default) is None  # no iCloud Drive on this machine
+    icloud.mkdir()
+    assert cli.resolve_copy_dir(None, False, default) == default
+
+
+def test_copy_folder_can_be_overridden_or_turned_off(tmp_path: Path) -> None:
+    """--copy-to replaces the default (even when it doesn't exist yet), and --no-copy beats everything."""
+    default = tmp_path / "CloudDocs" / "Resumes"
+    other = tmp_path / "Elsewhere"
+    assert cli.resolve_copy_dir(other, False, default) == other
+    assert cli.resolve_copy_dir(Path("~/Somewhere"), False, default) == Path("~/Somewhere").expanduser()
+    assert cli.resolve_copy_dir(other, True, default) is None
+    (tmp_path / "CloudDocs").mkdir()
+    assert cli.resolve_copy_dir(None, True, default) is None
+
+
+def test_default_copy_folder_is_in_icloud_drive() -> None:
+    """The built-in default is the Resumes folder of iCloud Drive, spelled without a user name."""
+    assert cli.DEFAULT_COPY_DIR.name == "Resumes" and cli.DEFAULT_COPY_DIR.parent.name == "com~apple~CloudDocs"
+    assert cli.DEFAULT_COPY_DIR.is_relative_to(Path.home())
