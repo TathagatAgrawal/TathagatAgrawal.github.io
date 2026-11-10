@@ -355,6 +355,7 @@ class SkillLineRef(Strict):
 class ResumeConfig(Strict):
     """One resume: its sections in order, and the keys of the jobs, projects and papers under them."""
 
+    filename: str | None = None  # the name of its PDF outside the repository, without .pdf
     sections: list[Section]
     skills: list[str | SkillLineRef] = []  # ids of the lines in content/skills.yaml, in order
     experience: list[str] = []
@@ -363,6 +364,16 @@ class ResumeConfig(Strict):
     other_projects: list[str] = []
     publications: list[str] = []
     layout: ResumeLayout = ResumeLayout()
+
+    @field_validator("filename")
+    @classmethod
+    def _check_filename(cls, value: str | None) -> str | None:
+        """Reject names that are not a plain file name (no folders, no characters a file system refuses)."""
+        if value is not None and (
+            not value.strip() or value.startswith(".") or re.search(r'[/\\:*?"<>|\x00-\x1f]', value)
+        ):
+            raise ValueError('a file name without folders, a leading dot or any of / \\ : * ? " < > |')
+        return value
 
 
 class WebsiteConfig(Strict):

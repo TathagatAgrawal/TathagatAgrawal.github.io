@@ -34,7 +34,7 @@ def test_rebuild_swaps_in_the_new_site(tmp_path: Path, monkeypatch: pytest.Monke
     out.mkdir()
     (out / "old.html").write_text("old")
 
-    def fake_build(path: Path, *, drafts: bool, shown_as: Path | None = None) -> bool:
+    def fake_build(path: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True) -> bool:
         """Write a new site to the folder it is given."""
         path.mkdir()
         (path / "new.html").write_text("new")
@@ -52,7 +52,7 @@ def test_crashed_rebuild_keeps_the_previous_site(tmp_path: Path, monkeypatch: py
     out.mkdir()
     (out / "old.html").write_text("old")
 
-    def crashing_build(path: Path, *, drafts: bool, shown_as: Path | None = None) -> bool:
+    def crashing_build(path: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True) -> bool:
         """Start writing a site and then fail."""
         path.mkdir()
         (path / "half.html").write_text("half")
@@ -69,7 +69,7 @@ def test_failed_content_check_keeps_the_previous_site(tmp_path: Path, monkeypatc
     out = tmp_path / "_site"
     out.mkdir()
     (out / "old.html").write_text("old")
-    monkeypatch.setattr(cli, "run_build", lambda path, *, drafts, shown_as=None: False)
+    monkeypatch.setattr(cli, "run_build", lambda path, *, drafts, shown_as=None, check_pdfs=True: False)
     assert cli._rebuild(out, drafts=False) is False
     assert [p.name for p in out.iterdir()] == ["old.html"]
 

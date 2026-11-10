@@ -18,17 +18,19 @@ from pathlib import Path
 
 from . import checks
 from .content import ContentError, load
-from .resume import compile_resume
+from .resume import build_pdf, file_name, write_if_changed
 from .site import build_site
 
 ROOT = Path(__file__).resolve().parents[2]
 WATCHED = ["content", "resume", "src/portfolio"]
 
 
-def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None) -> bool:
+def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True) -> bool:
     """Validate everything, build the site into out/ and print problems. Returns True on success.
 
-    shown_as is the folder to name in the final message when out/ is only a staging folder.
+    shown_as is the folder to name in the final message when out/ is only a staging folder. check_pdfs
+    warns about committed resume PDFs that no longer match the content (the dev server turns it off, since
+    they are naturally out of date while you edit).
     """
     try:
         content = load(ROOT)
@@ -42,11 +44,16 @@ def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None) -> bool:
     resumes = list(content.site.resumes)
     published: bytes | None = None
     for name in resumes:
+        committed = ROOT / "resume" / f"{name}.pdf"
+        previous = committed.read_bytes() if committed.exists() else None
         try:
-            pdf = compile_resume(content, name)
+            pdf, changed = build_pdf(content, name, previous)
         except RuntimeError as exc:
             errors.append(f"Resume does not compile: {exc}")
             continue
+        if check_pdfs and changed:
+            state = "is missing" if previous is None else "is out of date"
+            warnings.append(f"resume/{name}.pdf {state}; run `uv run resume` and commit it")
         if name == content.site.website.resume:
             published = pdf
 
@@ -100,7 +107,7 @@ def _rebuild(out: Path, *, drafts: bool) -> bool:
     staging = out.with_name(out.name + ".building")
     shutil.rmtree(staging, ignore_errors=True)
     try:
-        ok = run_build(staging, drafts=drafts, shown_as=out)
+        ok = run_build(staging, drafts=drafts, shown_as=out, check_pdfs=False)
     except Exception:  # noqa: BLE001 - deliberate: keep serving the previous site however the build failed
         traceback.print_exc()
         print("Build crashed; still serving the previous site. Fix the error and save again.", file=sys.stderr)
@@ -203,46 +210,75 @@ def main() -> None:
     sys.exit(0 if run_build(args.out, drafts=args.drafts) else 1)
 
 
-def _write_resumes(targets: list[str], out_file: Path | None) -> bool:
-    """Reload the content and compile each named resume to resume/<name>.pdf; print and return any problem."""
+def _write_resumes(
+    targets: list[str], out_file: Path | None, copy_dir: Path | None = None, repo_dir: Path | None = None
+) -> bool:
+    """Reload the content and build each named resume; print and return any problem.
+
+    Each PDF goes to resume/<name>.pdf (or out_file), where it is kept under Git and only changes when the
+    content does, and, if copy_dir is given, to <copy_dir>/<filename>.pdf as well.
+    """
     try:
         content = load(ROOT)
     except ContentError as exc:
         print(f"Content errors:\n{exc}", file=sys.stderr)
         return False
+    repo_dir = repo_dir or ROOT / "resume"
+    if copy_dir is not None:
+        if not copy_dir.parent.exists():
+            print(
+                f"error: {copy_dir.parent} does not exist, so {copy_dir.name!r} can't be created in it", file=sys.stderr
+            )
+            return False
+        copy_dir.mkdir(exist_ok=True)
     ok = True
     for name in targets:
-        out = out_file if out_file and len(targets) == 1 else ROOT / "resume" / f"{name}.pdf"
+        out = out_file if out_file and len(targets) == 1 else repo_dir / f"{name}.pdf"
+        previous = out.read_bytes() if out.exists() else None
         try:
-            out.write_bytes(compile_resume(content, name))
-            print(f"Wrote {out.relative_to(ROOT) if out.is_relative_to(ROOT) else out}")
+            pdf, _ = build_pdf(content, name, previous)
         except RuntimeError as exc:
             print(f"error: {exc}", file=sys.stderr)
             ok = False
+            continue
+        shown = out.relative_to(ROOT) if out.is_relative_to(ROOT) else out
+        print(f"{'Wrote' if write_if_changed(out, pdf) else 'Up to date:'} {shown}")
+        if copy_dir is not None:
+            copy = copy_dir / f"{file_name(content, name)}.pdf"
+            print(f"  {'copied to' if write_if_changed(copy, pdf) else 'already in'} {copy}")
     return ok
 
 
 def resume_main() -> None:
-    """`uv run resume <name>`: compile a resume from content/config.yaml to resume/<name>.pdf (or --out)."""
+    """`uv run resume <name>`: build resumes from content/config.yaml into resume/ and, optionally, another folder."""
     try:
         names = list(load(ROOT).site.resumes)
     except ContentError as exc:
         print(f"Content errors:\n{exc}", file=sys.stderr)
         sys.exit(1)
-    parser = argparse.ArgumentParser(prog="resume", description="Compile a resume to PDF.")
+    parser = argparse.ArgumentParser(prog="resume", description="Build resumes as PDFs into resume/ (kept in Git).")
     parser.add_argument(
         "name", nargs="?", choices=sorted(names) + ["all"], default="all", help="which resume (default: all)"
     )
-    parser.add_argument("--out", type=Path, help="output file (only with a single resume)")
+    parser.add_argument("--out", type=Path, help="write the PDF here instead of resume/<name>.pdf (single resume only)")
+    parser.add_argument(
+        "--copy-to",
+        type=Path,
+        default=os.environ.get("RESUME_COPY_DIR") or None,
+        metavar="DIR",
+        help="also copy each PDF into DIR under its `filename` from config.yaml, e.g. a folder in iCloud Drive "
+        "(default: the RESUME_COPY_DIR environment variable)",
+    )
     parser.add_argument("--watch", action="store_true", help="rebuild the PDF on every save (for live preview)")
     args = parser.parse_args()
+    copy_dir = args.copy_to.expanduser() if args.copy_to else None
 
     targets = names if args.name == "all" else [args.name]
-    ok = _write_resumes(targets, args.out)
+    ok = _write_resumes(targets, args.out, copy_dir)
     if args.watch:
         print("Watching content, resume and code files; Ctrl+C to stop.")
         try:
-            _watch(lambda: _write_resumes(targets, args.out))
+            _watch(lambda: _write_resumes(targets, args.out, copy_dir))
         except KeyboardInterrupt:
             return
     sys.exit(0 if ok else 1)

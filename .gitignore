@@ -2,9 +2,10 @@
 # Never committed. The build also refuses to run if anything in here is tracked.
 private/
 
-# Build output and generated PDFs (the published resume is built by GitHub Actions).
+# Build output and generated PDFs. The resumes in resume/ are the exception: they are kept in Git.
 _site/
 *.pdf
+!resume/*.pdf
 
 # Python
 .venv/

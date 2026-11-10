@@ -13,7 +13,8 @@ Requires [uv](https://docs.astral.sh/uv/). Typst is installed by uv as a Python 
 uv run build --serve          # build the site, serve it at http://localhost:8000, rebuild on every save
 uv run build --serve --drafts # the same, including projects not listed in the config (for reviewing them)
 uv run build                  # check everything and build the site into _site/
-uv run resume                 # build all resumes to resume/*.pdf (or: uv run resume ml)
+uv run resume                 # build all resumes to resume/*.pdf, which are kept in Git (or: uv run resume ml)
+uv run resume --copy-to DIR   # ...and copy them, under their own names, into DIR (see Resume PDFs)
 uv run resume ml --watch      # rebuild resume/ml.pdf on every save, for a live preview
 uv run pytest                 # tests
 ```
@@ -45,6 +46,7 @@ content/
   pages/contact.md        the Contact page
 resume/
   resume.typ, lib.typ     the resume layout; the content comes from src/portfolio/resume_data.py
+  general.pdf, ml.pdf, quant.pdf   the built resumes, kept in Git (`uv run resume` rewrites them)
 src/portfolio/            the website builder, the resume data builder, templates, stylesheet and checks
 private/                  gitignored: cover letters, application notes, tailored resumes
 ```
@@ -276,7 +278,8 @@ The text of a resume (bullets, `short`, `note`, the profile summary) is converte
 | Change the headline or email | Edit the frontmatter of `content/index.md`; the intro paragraph is its body. The preview image shown when the site is shared (`/og-image.png`) is drawn from your name and headline at every build, so it follows along |
 | Change a resume's sections, order, jobs, projects or papers | Edit its entry under `resumes:` in `content/config.yaml` (lists are in display order, so the length is the count) |
 | Change a resume's margins or sizes | Add `layout:` to its entry, e.g. `layout: { margin: 0.4in, gap: 0.45em, name_size: 16pt, font_size: 10pt }` |
-| Add a resume | Add an entry under `resumes:` in `content/config.yaml`; `uv run resume <name>` builds it, and `website.resume` picks the one published as `/resume.pdf` |
+| Add a resume | Add an entry under `resumes:` in `content/config.yaml` (with a `filename`); `uv run resume <name>` builds it, and `website.resume` picks the one published as `/resume.pdf` |
+| Get the resumes on my phone | `uv run resume --copy-to` an iCloud Drive folder (see Resume PDFs) |
 | Make a resume for one application | Add an entry to `resumes:` with a neutral name (the config is committed, so keep company names out of it), build it with `uv run resume <name>`, and delete the entry afterwards. Save the PDF in `private/` |
 | Change the Contact page | Edit `content/pages/contact.md` |
 | Add another standalone page | Add `content/pages/<name>.md` (it is served at `/<name>/`) |
@@ -294,6 +297,31 @@ The text of a resume (bullets, `short`, `note`, the profile summary) is converte
 - a file that would be committed contains something that looks like a phone number, or anything in `private/` is tracked by Git.
 
 It only warns (the site still builds) about search-engine problems: a page with no meta description, one under 70 or over about 160 characters, or two pages with the same title or description.
+
+## Resume PDFs
+
+`uv run resume` builds every resume to `resume/<name>.pdf`. These PDFs **are committed to Git**, so GitHub always holds the current resumes. Commit them whenever the content changes:
+
+```sh
+uv run resume                 # rebuild the PDFs
+git add resume && git commit  # keep them in the repository
+```
+
+A PDF records the date it was made, so a rebuild would normally change every file. To avoid that, a resume is rebuilt with the date already inside the existing PDF: if the result is identical the file is left alone, and the date only moves forward when the content really changed. `uv run build --check` (and the pre-commit hook) warns when a committed PDF no longer matches the content, so you are reminded to rebuild it.
+
+**A copy on your phone.** `--copy-to DIR` also writes each PDF into a folder you choose, named by `filename` in its entry in `content/config.yaml` (for example `Tathagat Agrawal - Resume (ML).pdf`, which is what a recruiter sees when you send it). Point it at a folder in iCloud Drive and the files appear on your iPhone in the Files app:
+
+```sh
+uv run resume --copy-to "$HOME/Library/Mobile Documents/com~apple~CloudDocs/Resumes"
+```
+
+To do this on every run, put the folder in an environment variable once, in `~/.zshrc`, and run plain `uv run resume`:
+
+```sh
+export RESUME_COPY_DIR="$HOME/Library/Mobile Documents/com~apple~CloudDocs/Resumes"
+```
+
+The folder (`Resumes`) is created if its parent exists, and a file is only rewritten when it changed, so iCloud isn't made to re-upload identical PDFs. A symlink would not work here: iCloud stores a link as a path on your Mac, which your phone can't follow, so the real files have to live in iCloud.
 
 ## Search engines (SEO)
 

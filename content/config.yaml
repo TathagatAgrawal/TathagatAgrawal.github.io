@@ -70,9 +70,11 @@ website:
 # Every resume, built by `uv run resume` into resume/<name>.pdf. Each one lists the sections it shows, in
 # order, and which jobs, projects and papers go under them (in the order given). To add a resume, add an
 # entry here. Text that differs between resumes lives in the `resume.variants.<name>` part of an entry's file.
+# `filename` is the name of the PDF copied outside the repository (`uv run resume --copy-to`), e.g. into iCloud Drive.
 resumes:
   # One page. Published on the website as /resume.pdf.
   general:
+    filename: Tathagat Agrawal - Resume
     sections: [summary, skills, experience, projects, publications, education]
     skills: [languages-and-tools, generative-ai, ml-and-dl, deployment-mlops, data-and-viz]
     experience: [neural-nurture]
@@ -84,6 +86,7 @@ resumes:
 
   # Two pages, for ML, NLP and LLM roles.
   ml:
+    filename: Tathagat Agrawal - Resume (ML)
     sections: [summary, experience, publications, skills, education, projects, certifications]
     skills: [languages, ml-dl, llm-nlp, deployment, data-viz, dev-tools]
     experience: [neural-nurture, finlatics]
@@ -99,6 +102,7 @@ resumes:
 
   # Two pages, for quantitative research and trading roles.
   quant:
+    filename: Tathagat Agrawal - Resume (Quant)
     sections: [summary, experience, publications, skills, education, projects, certifications]
     skills:
       - languages
