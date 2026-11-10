@@ -2,11 +2,11 @@
    Type: one size for all body text (1.0625rem), one per heading level. Secondary text is grey, not smaller. */
 
 /* Theme: follows the system until the visitor uses the toggle (theme.js sets data-theme). */
-:root { --text: #111; --muted: #5c5c5c; --rule: #d9d9d9; --bg: #fff; --light-only: block; --dark-only: none; color-scheme: light; }
-:root[data-theme="dark"] { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; color-scheme: dark; }
+:root { --text: #111; --muted: #5c5c5c; --rule: #d9d9d9; --bg: #fff; --light-only: block; --dark-only: none; --image-filter: none; color-scheme: light; }
+:root[data-theme="dark"] { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; --image-filter: brightness(0.82); color-scheme: dark; }
 
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --text: #e6e6e6; --muted: #a3a3a3; --rule: #3a3a3a; --bg: #121212; --light-only: none; --dark-only: block; --image-filter: brightness(0.82); color-scheme: dark; }
 }
 
 * { box-sizing: border-box; }
@@ -42,9 +42,14 @@ header nav a { display: inline-flex; flex-direction: column; white-space: nowrap
 header nav a::after { content: attr(data-label); font-weight: 600; height: 0; overflow: hidden; visibility: hidden; user-select: none; }
 header nav a[aria-current="page"] { text-decoration: none; font-weight: 600; }
 
-/* Pushed to the right end of the navigation row; on phones it simply follows the last link. */
-.theme-toggle { margin-left: auto; font: inherit; color: var(--muted); background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 0.2em; white-space: nowrap; }
-.theme-toggle:hover { color: var(--text); text-decoration-thickness: 2px; }
+/* An icon pinned to the top-right corner of the header, level with the name, so it never competes with the links for room. */
+.theme-toggle { position: absolute; top: 1.4rem; right: 0; display: inline-flex; align-items: center; justify-content: center; width: 2rem; height: 2rem; padding: 0; color: var(--muted); background: none; border: 0; cursor: pointer; }
+.theme-toggle[hidden] { display: none; }
+.theme-toggle:hover { color: var(--text); }
+.theme-toggle svg { width: 1.25rem; height: 1.25rem; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+/* A moon in light mode (switch to dark), a sun in dark mode (switch to light). */
+.icon-moon { display: var(--light-only); }
+.icon-sun { display: var(--dark-only); }
 
 h1 { font-size: 1.75rem; line-height: 1.25; margin: 0 0 0.75rem; }
 h2 { font-size: 1.25rem; margin: 3rem 0 1rem; }
@@ -52,7 +57,10 @@ h3 { font-size: 1.0625rem; margin: 0; }
 p, ul, ol { margin: 0 0 1rem; }
 /* Browsers shrink monospace text by default; keep code at the body size. */
 code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 1em; }
+/* Long inline code wraps instead of running off a narrow screen; code blocks scroll sideways instead. */
+code { overflow-wrap: anywhere; }
 pre { overflow-x: auto; }
+pre code { overflow-wrap: normal; }
 ul, ol { padding-left: 1.25rem; }
 li { margin-bottom: 0.35rem; }
 
@@ -68,6 +76,8 @@ th, td { text-align: left; vertical-align: top; padding: 0.4rem 0.75rem 0.4rem 0
 /* Figures fill the column; wide ones (plots) extend up to 60rem so their labels stay readable. */
 figure { margin: 2rem 0; }
 figure img { display: block; width: 100%; height: auto; }
+/* Figures that have no dark variant (no light-only/dark-only class) are dimmed in dark mode, so a white plot doesn't glare. */
+figure img:not([class]) { filter: var(--image-filter); }
 figure.wide { margin-inline: calc(50% - min(30rem, 50vw - 1.25rem)); }
 figcaption { max-width: 37.5rem; margin: 0.5rem auto 0; color: var(--muted); }
 .light-only { display: var(--light-only); }
@@ -85,13 +95,13 @@ td.num { white-space: nowrap; }
 
 footer { margin-top: 4.5rem; padding-top: 1.25rem; border-top: 1px solid var(--rule); color: var(--muted); }
 
-/* Phones: a smaller sticky header so it doesn't take over the screen. */
+/* Phones: the header scrolls away with the page (relative, not sticky), since a sticky one would take a sixth of the screen. */
 @media (max-width: 30rem) {
-  html { scroll-padding-top: 9rem; }
-  header { padding-top: 1rem; margin-bottom: 2rem; }
+  html { scroll-padding-top: 1rem; }
+  header { position: relative; padding-top: 1rem; margin-bottom: 2rem; }
   header .name { font-size: 1.3rem; margin-bottom: 0.35rem; }
   header nav { gap: 0.1rem 0.75rem; }
-  .theme-toggle { margin-left: 0; }
+  .theme-toggle { top: 0.75rem; }
 }
 
 @media print { header { position: static; border: 0; } header nav, footer, .pager { display: none; } body { max-width: none; } }

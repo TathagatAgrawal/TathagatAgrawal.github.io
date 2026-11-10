@@ -61,7 +61,7 @@ def test_csv_table_unknown_column_is_an_error(tmp_path: Path) -> None:
 
 
 def test_h1_is_rejected_on_project_pages(tmp_path: Path) -> None:
-    """Project pages take their title from project.yaml, so # headings are flagged."""
+    """Project pages take their title from the frontmatter, so # headings are flagged."""
     _, env = render_page("# Title\n", Path("page.md"), tmp_path)
     assert env.errors
     _, env = render_page("# Title\n", Path("contact.md"), tmp_path, allow_h1=True)

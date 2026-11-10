@@ -6,10 +6,22 @@ start: 2025-10
 end:                     # empty means "present"
 skills: [learning-to-rank, gradient-boosting, shap, fine-tuning, ner, hugging-face, agents, llm-evaluation, prompt-engineering, experiment-design, pytorch, python]
 
+# One line for the home page.
+summary: Learning-to-rank recommender (+40% NDCG@3), LLM fine-tuning (98.4% factual accuracy), multi-task NER (F1 above 94%).
+
+# Markdown. Shown on the website and on every resume, unless replaced below.
+bullets:
+  - Developed a learning-to-rank **recommendation system (LambdaMART/XGBoost)** for the travel industry, engineering custom relevance features and **improving NDCG@3 by about 40%** over the prior baseline across multi-query test sets.
+  - Integrated **explainability techniques** (e.g. SHAP, attention weights) into recommendation models to surface human-interpretable explanations for end users.
+  - '**Fine-tuned LLMs** using SFT and LoRA to generate natural language explanations for recommendations; diagnosed and resolved a training data bias causing hallucinations, **improving factual accuracy to 98.4%**.'
+  - Built and trained a **multi-task NER + intent classification model** (RoBERTa backbone) on a custom dataset of 100,000 annotated samples, covering 44 entity classes, achieving an F1-score of over 94%.
+  - Designed **agentic tool-calling architecture** for a conversational travel application -- including prompt engineering and external API integration (handling ToS compliance and cost optimization) -- to route structured NER output to the right tools in the pipeline.
+  - Designed an **end-to-end evaluation framework** for the product, leading to early bug discovery and continuous monitoring of performance metrics.
+  - Translated recent **ML research** into production-ready prototypes by systematically reviewing papers, and **designing controlled experiments** across LLMs and conventional ML models to validate applicability to product use cases.
+  - Presented experimental results and architectural proposals to senior leadership, influencing product roadmap decisions based on empirical data; conducted technical interviews for ML internship candidates.
+
 website:
-  # One line for the home page.
-  summary: Learning-to-rank recommender (+40% NDCG@3), LLM fine-tuning (98.4% factual accuracy), multi-task NER (F1 above 94%).
-  # Markdown.
+  # Replaces the bullets above on the website only (delete to use the shared ones).
   bullets:
     - Built a learning-to-rank recommendation system (LambdaMART/XGBoost) for the travel industry with custom relevance features, improving NDCG@3 by about 40% over the previous baseline, with SHAP and attention-weight explanations for end users.
     - Fine-tuned LLMs with SFT and LoRA to explain recommendations in natural language; found and fixed a training-data bias that caused hallucinations, raising factual accuracy to 98.4%.
@@ -19,22 +31,13 @@ website:
     - Turned recent research into prototypes through controlled experiments across LLMs and conventional ML models, presented results and architecture proposals to senior leadership, and interviewed ML internship candidates.
 
 resume:
-  # Typst markup. Used by the ML and quant resumes.
-  bullets:
-    - Developed a learning-to-rank *recommendation system (LambdaMART/XGBoost)* for the travel industry, engineering custom relevance features and *improving NDCG\@3 by about 40%* over the prior baseline across multi-query test sets.
-    - Integrated *explainability techniques* (e.g. SHAP, attention weights) into recommendation models to surface human-interpretable explanations for end users.
-    - '*Fine-tuned LLMs* using SFT and LoRA to generate natural language explanations for recommendations; diagnosed and resolved a training data bias causing hallucinations, *improving factual accuracy to 98.4%*.'
-    - Built and trained a *multi-task NER + intent classification model* (RoBERTa backbone) on a custom dataset of 100,000 annotated samples, covering 44 entity classes, achieving an F1-score of over 94%.
-    - Designed *agentic tool-calling architecture* for a conversational travel application -- including prompt engineering and external API integration (handling ToS compliance and cost optimization) -- to route structured NER output to the right tools in the pipeline.
-    - Designed an *end-to-end evaluation framework* for the product, leading to early bug discovery and continuous monitoring of performance metrics.
-    - Translated recent *ML research* into production-ready prototypes by systematically reviewing papers, and *designing controlled experiments* across LLMs and conventional ML models to validate applicability to product use cases.
-    - Presented experimental results and architectural proposals to senior leadership, influencing product roadmap decisions based on empirical data; conducted technical interviews for ML internship candidates.
+  # Replaces the bullets above for one resume only.
   variants:
     general:
       bullets:
-        - Built a *learning-to-rank recommendation system* (LambdaMART/XGBoost) for the travel industry with custom relevance features, *improving NDCG\@3 by about 40%* over the prior baseline; added SHAP/attention-weight explainability for end users.
-        - '*Fine-tuned LLMs* using SFT and LoRA to generate natural language explanations for recommendations; diagnosed and resolved a training data bias causing hallucinations, *improving factual accuracy to 98.4%*.'
-        - Built and trained a *multi-task NER + intent classification model* (RoBERTa backbone) on a custom dataset of 100,000 annotated samples covering 44 entity classes, achieving an F1-score of over 94%.
-        - Designed the *agentic tool-calling architecture* for a conversational travel application, including prompt engineering and external API integration (ToS compliance, cost optimization), to route structured NER output to the right tools.
-        - Designed an *end-to-end evaluation framework*, leading to early bug discovery and continuous performance monitoring.
-        - Translated recent *ML research* into production-ready prototypes through controlled experiments across LLMs and conventional ML models; presented experimental results and architectural proposals to senior leadership, influencing product roadmap decisions; conducted technical interviews for ML internship candidates.
+        - Built a **learning-to-rank recommendation system** (LambdaMART/XGBoost) for the travel industry with custom relevance features, **improving NDCG@3 by about 40%** over the prior baseline; added SHAP/attention-weight explainability for end users.
+        - '**Fine-tuned LLMs** using SFT and LoRA to generate natural language explanations for recommendations; diagnosed and resolved a training data bias causing hallucinations, **improving factual accuracy to 98.4%**.'
+        - Built and trained a **multi-task NER + intent classification model** (RoBERTa backbone) on a custom dataset of 100,000 annotated samples covering 44 entity classes, achieving an F1-score of over 94%.
+        - Designed the **agentic tool-calling architecture** for a conversational travel application, including prompt engineering and external API integration (ToS compliance, cost optimization), to route structured NER output to the right tools.
+        - Designed an **end-to-end evaluation framework**, leading to early bug discovery and continuous performance monitoring.
+        - Translated recent **ML research** into production-ready prototypes through controlled experiments across LLMs and conventional ML models; presented experimental results and architectural proposals to senior leadership, influencing product roadmap decisions; conducted technical interviews for ML internship candidates.

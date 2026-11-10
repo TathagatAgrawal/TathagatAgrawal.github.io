@@ -3,14 +3,24 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{% block title %}{{ page_title }}{% endblock %}</title>
+<title>{{ page_title }}</title>
 <meta name="description" content="{{ description }}">
 <link rel="canonical" href="{{ site.url }}{{ path }}">
-<meta property="og:type" content="website">
-<meta property="og:title" content="{{ page_title }}">
+<meta property="og:type" content="{{ og_type }}">
+<meta property="og:title" content="{{ og_title }}">
 <meta property="og:description" content="{{ description }}">
 <meta property="og:url" content="{{ site.url }}{{ path }}">
+<meta property="og:image" content="{{ site.url }}/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{ profile.name }}: {{ profile.headline }}">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="/style.css">
+{%- block head %}{% endblock %}
+{%- if jsonld %}
+<script type="application/ld+json">{{ jsonld|safe }}</script>
+{%- endif %}
 <script>try { var t = localStorage.getItem("theme"); if (t) document.documentElement.dataset.theme = t; } catch (e) {}</script>
 </head>
 <body>
@@ -19,9 +29,12 @@
   <a class="name" href="/">{{ profile.name }}</a>
   <nav aria-label="Main">
     {%- for href, label, key in nav %}
-    <a href="{{ href }}" data-label="{{ label }}"{% if key == section %} aria-current="page"{% endif %}>{{ label }}</a>
+    <a href="{{ href }}" data-label="{{ label }}"{% if key == section %} aria-current="page"{% endif %}{% if href.endswith(".pdf") %} target="_blank" rel="noopener" aria-label="{{ label|replace(" \u2197", "") }}, opens in a new tab" title="Opens the PDF in a new tab"{% endif %}>{{ label }}</a>
     {%- endfor %}
-    <button class="theme-toggle" type="button" hidden>Dark mode</button>
+    <button class="theme-toggle" type="button" hidden aria-label="Switch to dark mode" title="Switch to dark mode">
+      <svg class="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5z"/></svg>
+      <svg class="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"/></svg>
+    </button>
   </nav>
 </header>
 
@@ -34,8 +47,8 @@
 
 <footer>
   <a href="mailto:{{ profile.email }}">{{ profile.email }}</a> &middot;
-  <a href="{{ profile.links.github }}">GitHub</a> &middot;
-  <a href="{{ profile.links.linkedin }}">LinkedIn</a><br>
+  <a href="{{ profile.links.github }}" rel="me">GitHub</a> &middot;
+  <a href="{{ profile.links.linkedin }}" rel="me">LinkedIn</a><br>
   Last updated {{ updated }}
 </footer>
 

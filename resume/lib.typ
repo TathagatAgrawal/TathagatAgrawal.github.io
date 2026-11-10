@@ -1,59 +1,9 @@
-// Shared resume layout. Each resume file (general.typ, ml.typ, quant.typ) only lists what goes in it;
-// every word comes from the YAML files in content/. Compile from the repository root so that
-// /content resolves, e.g.  typst compile --root . resume/ml.typ
-//
-// Text under a `resume:` key in the YAML files is Typst markup (*bold*, _italic_, \@ ...).
-// Shared fields (titles, organisations, dates) are plain text.
-
-#let months = (
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-)
-
-// "2026-09" -> "September 2026"; "2025" -> "2025".
-#let fmt-date(d) = {
-  if d == none { return none }
-  let s = str(d)
-  if s.len() == 4 { s } else { months.at(int(s.slice(5, 7)) - 1) + " " + s.slice(0, 4) }
-}
-
-// A start and end date as shown on the resume. No end date means the role is current.
-#let fmt-range(start, end) = {
-  if end == none { fmt-date(start) + " – Present" }
-  else if str(start) == str(end) { fmt-date(start) }
-  else { fmt-date(start) + " – " + fmt-date(end) }
-}
+// Shared resume layout. It lays out one resume from the data that src/portfolio/resume_data.py builds
+// (the sections, jobs, projects, papers and skill lines of that resume, with dates formatted and every
+// piece of Markdown already converted to Typst markup), so it never reads the content files itself.
+// Build with `uv run resume <name>`; the data arrives as the `data` input.
 
 #let markup(s) = eval(s, mode: "markup")
-
-// The first value unless it is none.
-#let either(a, b) = if a == none { b } else { a }
-
-// The `resume:` part of an entry with the overrides for this variant applied on top.
-#let merged(part, variant) = {
-  let out = part
-  let v = part.at("variants", default: (:)).at(variant, default: none)
-  if v != none {
-    for (k, val) in v { out.insert(k, val) }
-  }
-  out
-}
-
-#let load-project(key) = {
-  let p = yaml("/content/projects/" + key + "/project.yaml")
-  if p.at("resume", default: none) == none {
-    panic("content/projects/" + key + "/project.yaml has no resume: part, so it can't go on a resume")
-  }
-  p
-}
-
-#let load-experience(key) = {
-  let e = yaml("/content/experience/" + key + ".yaml")
-  if e.at("resume", default: none) == none {
-    panic("content/experience/" + key + ".yaml has no resume: part, so it can't go on a resume")
-  }
-  e
-}
 
 // A bullet is either a string or a mapping with `text` and nested `bullets`.
 #let bullet-list(items) = list(..items.map(b => {
@@ -68,26 +18,19 @@
   [#text(weight: "bold")[#right-top]\ #text(style: "italic")[#right-bottom]],
 )
 
-#let resume(
-  variant: "default",
-  // Section keys in display order: summary, experience, projects, publications, skills,
-  // education, certifications.
-  sections: (),
-  experience: (),
-  education: (),
-  projects: (),
-  other-projects: (),
-  margin: 0.5in,
-  gap: 0.625em,
-  name-size: 20pt,
-  font-size: 10pt,
-  accent: blue,
-  doc,
-) = {
-  let profile = yaml("/content/profile.yaml")
-  let github-user = profile.links.github.split("/").last()
+// A link with the given text, or nothing if there is no address.
+#let link-or-none(l) = if l != none { link(l.url)[#l.text] }
 
-  set document(title: profile.name + " – Resume", author: profile.name)
+#let resume(model, doc) = {
+  // Sizes come from the resume's `layout:` in content/config.yaml, written as Typst lengths ("0.4in").
+  let size(key, default) = if key in model.layout { eval(model.layout.at(key)) } else { default }
+  let margin = size("margin", 0.5in)
+  let gap = size("gap", 0.625em)
+  let name-size = size("name-size", 20pt)
+  let font-size = size("font-size", 10pt)
+  let accent = blue
+
+  set document(title: model.name + " – Resume", author: model.name)
   set page(paper: "a4", margin: margin, numbering: none)
   set par(justify: true, spacing: gap, leading: gap)
   set text(size: font-size)
@@ -102,99 +45,66 @@
   show link: it => text(fill: accent, underline(it))
 
   // Name and contact links.
-  let header-links = profile.resume.at("header_links", default: ("email", "github", "linkedin")).map(k => {
-    if k == "email" { profile.email }
-    else if k == "github" { link(profile.links.github)[GitHub] }
-    else if k == "linkedin" { link(profile.links.linkedin)[LinkedIn] }
-    else if k == "website" { link(profile.links.website)[Website] }
-  })
+  let header-links = model.links.map(l => if "url" in l { link(l.url)[#l.text] } else { l.text })
   grid(
     columns: (1fr, 1fr),
     align: (left + bottom, right + bottom),
-    text(weight: "bold", size: name-size, fill: accent)[#profile.name],
+    text(weight: "bold", size: name-size, fill: accent)[#model.name],
     text(weight: "bold")[#header-links.join([ ~|~ ])],
   )
   v(0.25 * gap)
   line(length: 100%, stroke: accent)
 
-  let project-link(p, r) = {
-    if p.at("repository", default: none) != none and not p.at("private", default: false) {
-      link("https://github.com/" + github-user + "/" + p.repository)[GitHub]
-    } else if r.at("link", default: none) != none {
-      link(r.link.url)[#r.link.label]
-    }
+  // Work experience and education entries share one layout.
+  let entries(items) = for (i, e) in items.enumerate() {
+    entry-head(e.title, e.subtitle, e.when, e.place)
+    if e.bullets.len() > 0 { bullet-list(e.bullets) }
+    if i < items.len() - 1 { v(gap) }
   }
 
-  for section in sections {
-    if section == "summary" {
-      markup(merged(profile.resume, variant).summary)
-    } else if section == "skills" {
+  for section in model.sections {
+    let kind = section.kind
+    if kind == "summary" {
+      markup(section.text)
+    } else if kind == "skills" {
       heading(level: 1)[Technical Skills]
-      let skills = yaml("/content/skills.yaml").resume
-      let lines = skills.at("variants", default: (:)).at(variant, default: skills.default)
-      for l in lines { terms.item(l.label, l.skills) }
-    } else if section == "experience" {
+      for l in section.lines { terms.item(l.label, l.skills) }
+    } else if kind == "experience" {
       heading(level: 1)[Work Experience]
-      for (i, key) in experience.enumerate() {
-        let e = load-experience(key)
-        let r = merged(e.resume, variant)
-        entry-head(either(r.at("title", default: none), e.role), e.organisation, fmt-range(e.start, e.at("end", default: none)), e.at("location", default: none))
-        if r.bullets.len() > 0 { bullet-list(r.bullets) }
-        if i < experience.len() - 1 { v(gap) }
-      }
-    } else if section == "education" {
+      entries(section.entries)
+    } else if kind == "education" {
       heading(level: 1)[Education]
-      for (i, key) in education.enumerate() {
-        let e = load-experience(key)
-        let r = merged(e.resume, variant)
-        let loc = e.at("location", default: none)
-        let place = if loc != none { e.organisation + ", " + loc } else { e.organisation }
-        entry-head(either(r.at("title", default: none), e.role), place, fmt-range(e.start, e.at("end", default: none)), e.at("grade", default: none))
-        if r.bullets.len() > 0 { bullet-list(r.bullets) }
-        if i < education.len() - 1 { v(gap) }
-      }
-    } else if section == "projects" {
+      entries(section.entries)
+    } else if kind == "projects" {
       heading(level: 1)[Projects]
-      for (i, key) in projects.enumerate() {
-        let p = load-project(key)
-        let r = merged(p.resume, variant)
-        entry-head(either(r.at("title", default: none), p.title), r.at("tech", default: none), fmt-date(p.date), project-link(p, r))
-        if r.bullets.len() > 0 { bullet-list(r.bullets) }
-        if i < projects.len() - 1 or other-projects.len() > 0 { v(gap) }
+      for (i, p) in section.entries.enumerate() {
+        entry-head(p.title, p.tech, p.date, link-or-none(p.link))
+        if p.bullets.len() > 0 { bullet-list(p.bullets) }
+        if i < section.entries.len() - 1 or section.others.len() > 0 { v(gap) }
       }
-      if other-projects.len() > 0 {
+      if section.others.len() > 0 {
         [*Other projects:*]
-        list(..other-projects.map(key => {
-          let p = load-project(key)
-          let r = merged(p.resume, variant)
-          let title = text(weight: "bold", either(r.at("title", default: none), p.title))
-          let url = if p.at("repository", default: none) != none and not p.at("private", default: false) {
-            "https://github.com/" + github-user + "/" + p.repository
-          }
-          let details = (r.at("tech", default: none), fmt-date(p.date)).filter(x => x != none).join(", ")
-          [#if url != none { link(url, title) } else { title } (#details): #markup(r.at("short", default: ""))]
+        list(..section.others.map(o => {
+          let title = text(weight: "bold", o.title)
+          [#if o.url != none { link(o.url, title) } else { title } (#o.details): #markup(o.short)]
         }))
       }
-    } else if section == "publications" {
+    } else if kind == "publications" {
       heading(level: 1)[Publications]
-      let pubs = yaml("/content/publications.yaml")
-      for (i, pub) in pubs.enumerate() {
-        let r = pub.at("resume", default: (:))
-        let cite = pub.authors.join(", ") + " (" + str(pub.year) + ") " + r.at("title", default: pub.title) + ". " + pub.venue + "."
-        let url = pub.at("url", default: none)
-        let note = r.at("note", default: none)
-        [#text(weight: "bold")[[#(i + 1)]] #cite #if url != none { link(url)[#pub.at("url_label", default: "Paper link")] }#if note != none { [. #markup(note)] }]
-        if i < pubs.len() - 1 { v(0.3 * gap) }
+      for (i, pub) in section.items.enumerate() {
+        let link-text = if pub.url != none { link(pub.url)[#pub.url_label] }
+        let note = if pub.note != none { [. #markup(pub.note)] }
+        [#text(weight: "bold")[[#(pub.number)]] #pub.cite #link-text#note]
+        if i < section.items.len() - 1 { v(0.3 * gap) }
       }
-    } else if section == "certifications" {
+    } else if kind == "certifications" {
       heading(level: 1)[Certifications]
-      let certs = yaml("/content/certifications.yaml")
-      for (i, c) in certs.enumerate() {
-        entry-head(c.title, c.issuer, fmt-date(c.date), if c.at("url", default: none) != none { link(c.url)[Certificate link] })
-        if i < certs.len() - 1 { v(gap) }
+      for (i, c) in section.entries.enumerate() {
+        entry-head(c.title, c.issuer, c.date, if c.url != none { link(c.url)[Certificate link] })
+        if i < section.entries.len() - 1 { v(gap) }
       }
     } else {
-      panic("unknown resume section " + repr(section))
+      panic("unknown resume section " + repr(kind))
     }
   }
   doc

@@ -4,20 +4,24 @@
   <p>Peer-reviewed papers, most recent first. My master's research studied grokking: when a network suddenly generalises long after it has memorised its training data, and what that does to transfer learning.</p>
 
   <h2>Publications</h2>
-  {%- for pub, project in publications %}
+  {%- for pub in publications %}
   <div class="entry">
-    <h3>{% if pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %}</h3>
-    <p class="meta">{{ pub.authors|join(", ") }} &middot; {{ venue(pub.venue) }}{% if pub.year|string not in pub.venue %}, {{ pub.year }}{% endif %}{% if project %} &middot; <a href="/projects/{{ project.key }}/">project page</a>{% endif %}</p>
-    {%- if pub.website.summary %}
-    <p>{{ inline(pub.website.summary) }}</p>
+    <h3>{% if pub.page %}<a href="/research/{{ pub.key }}/">{{ pub.title }}</a>{% elif pub.url %}<a href="{{ pub.url }}">{{ pub.title }}</a>{% else %}{{ pub.title }}{% endif %}</h3>
+    <p class="meta">{{ pub.authors|join(", ") }} &middot; {{ venue(pub.venue) }}{% if pub.year|string not in pub.venue %}, {{ pub.year }}{% endif %}{% if pub.page and pub.url %} &middot; <a href="{{ pub.url }}">{{ pub.url_label }}</a>{% endif %}</p>
+    {%- if pub.summary %}
+    <p>{{ inline(pub.summary) }}</p>
     {%- endif %}
   </div>
   {%- endfor %}
 
   {%- if theses %}
   <h2>Thesis</h2>
-  {%- for e, project in theses %}
-  <p><em>{{ e.data.thesis }}</em> <span class="muted">&middot; {{ e.data.role }}, {{ e.data.organisation }}, {{ year(e.data.end) }}</span>{% if project %} &middot; <a href="/projects/{{ project.key }}/">project page</a>{% endif %}</p>
+  {%- for t, degree in theses %}
+  <div class="entry">
+    <h3>{% if t.page %}<a href="/research/{{ t.key }}/">{{ t.title }}</a>{% else %}{{ t.title }}{% endif %}</h3>
+    <p class="meta"><a href="/experience/#{{ degree.key }}">{{ degree.data.role }}</a>, {{ degree.data.organisation }}, {{ year(degree.data.end) }}</p>
+    <p>{{ inline(t.summary) }}</p>
+  </div>
   {%- endfor %}
   {%- endif %}
 {% endblock %}

@@ -2,7 +2,7 @@
 {% macro project_entry(p) -%}
   <div class="entry">
     <h3>{% if p.page %}<a href="/projects/{{ p.key }}/">{{ p.data.title }}</a>{% else %}{{ p.data.title }}{% endif %}</h3>
-    <p class="meta">{{ year(p.data.date) }}{% if p.data.website.status != "Complete" %} &middot; {{ p.data.website.status }}{% endif %}{% if not p.visible %} &middot; <strong>hidden</strong>{% endif %}</p>
-    <p>{{ inline(p.data.website.summary) }}</p>
+    <p class="meta">{{ year(p.data.date) }}{% if p.data.status != "Complete" %} &middot; {{ p.data.status }}{% endif %}{% if not p.visible %} &middot; <strong>hidden</strong>{% endif %}</p>
+    <p>{{ inline(p.data.summary) }}</p>
   </div>
 {%- endmacro %}

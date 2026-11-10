@@ -5,24 +5,25 @@ location: Bhopal
 start: 2020
 end: 2025
 grade: "CGPA: 9.1/10.0"
-thesis: Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings
 skills: [dl-research, pytorch]
 
+# Markdown. Shown on the website and on every resume, unless replaced below.
+bullets:
+  - '**Relevant courses:** Applied ML, Computer Vision, NLP, Deep Learning, Hardware Acceleration for ML, Data Visualization, Big Data and Data Warehousing, Probability and Statistics, etc.'
+  - text: '**Master''s thesis:** *Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings*.'
+    bullets:
+      - Designed and performed transfer learning experiments using MLP and Transformer models to study the effects of grokking on model flexibility using loss landscape visualization and Hessian eigenvalue analysis.
+      - See publications \[1\] and \[2\].
+
 website:
-  project: grokking-thesis      # project page about the thesis, if shown
+  # Replaces the bullets above on the website only (delete to use the shared ones).
   bullets:
-    - "Master's thesis: *Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings*, which led to two [publications](/research/)."
+    - '[Master''s thesis](/research/grokking-thesis/): *Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings*, which led to two [publications](/research/).'
 
 resume:
   title: Integrated M. Tech. in AI
-  # Used by the ML and quant resumes.
-  bullets:
-    - "*Relevant courses:* Applied ML, Computer Vision, NLP, Deep Learning, Hardware Acceleration for ML, Data Visualization, Big Data and Data Warehousing, Probability and Statistics, etc."
-    - text: "*Master's thesis:* _Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings_."
-      bullets:
-        - Designed and performed transfer learning experiments using MLP and Transformer models to study the effects of grokking on model flexibility using loss landscape visualization and Hessian eigenvalue analysis.
-        - See publications \[1\] and \[2\].
+  # Replaces the bullets above for one resume only.
   variants:
     general:
       bullets:
-        - "*Master's thesis:* _Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings_ (publications #link(\"https://doi.org/10.1007/s42979-025-04182-z\")[\\[1\\]], \\[2\\])."
+        - '**Master''s thesis:** *Investigating the Effects of Grokking Phenomenon in Transfer Learning Settings* (publications [\[1\]](https://doi.org/10.1007/s42979-025-04182-z), \[2\]).'

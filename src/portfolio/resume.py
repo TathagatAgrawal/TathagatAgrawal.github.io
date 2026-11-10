@@ -1,24 +1,33 @@
-"""Compile the Typst resumes in resume/ with the Typst compiler bundled in the typst package."""
+"""Compile the resumes defined in content/config.yaml with the Typst compiler bundled in the typst package."""
 
 from __future__ import annotations
 
-from pathlib import Path
+import json
 
 import typst
 
+from .content import Content, ContentError
+from .resume_data import resume_model
 
-def resume_files(root: Path) -> dict[str, Path]:
-    """Every resume in resume/ by name (general, ml, ...); lib.typ is the shared layout, not a resume."""
-    return {p.stem: p for p in sorted((root / "resume").glob("*.typ")) if p.name != "lib.typ"}
+ENTRY = "resume/resume.typ"
 
 
-def compile_resume(root: Path, path: Path) -> bytes:
-    """Compile one resume to PDF bytes.
+def compile_resume(content: Content, name: str) -> bytes:
+    """Compile the resume called name in content/config.yaml to PDF bytes.
 
-    System fonts are ignored so that the PDF is identical on every machine, including GitHub's.
-    Raises RuntimeError with Typst's message if compilation fails.
+    The resume's data is built in Python and handed to resume/resume.typ as a Typst input. System fonts
+    are ignored so that the PDF is identical on every machine, including GitHub's.
+    Raises RuntimeError with the reason if the resume can't be built.
     """
+    if name not in content.site.resumes:
+        raise RuntimeError(f"no resume called {name!r}; the resumes are {', '.join(content.site.resumes)}")
     try:
-        return typst.compile(str(path), root=str(root), ignore_system_fonts=True)
-    except Exception as exc:  # typst raises its own error types; report them uniformly
-        raise RuntimeError(f"{path.relative_to(root)}: {exc}") from exc
+        model = resume_model(content, name)
+        return typst.compile(
+            str(content.root / ENTRY),
+            root=str(content.root),
+            ignore_system_fonts=True,
+            sys_inputs={"resume": name, "data": json.dumps(model, ensure_ascii=False)},
+        )
+    except (ContentError, typst.TypstError) as exc:
+        raise RuntimeError(f"resume {name}: {exc}") from exc

@@ -11,11 +11,12 @@
     return root.dataset.theme || (systemDark.matches ? 'dark' : 'light');
   }
 
-  // The button names the theme it switches to.
+  // The button is an icon (a moon in light mode, a sun in dark mode, drawn by the stylesheet); this keeps
+  // its accessible name and tooltip in step with the theme it would switch to.
   function label() {
-    var dark = current() === 'dark';
-    button.textContent = dark ? 'Light mode' : 'Dark mode';
-    button.setAttribute('aria-label', dark ? 'Switch to light mode' : 'Switch to dark mode');
+    var text = current() === 'dark' ? 'Switch to light mode' : 'Switch to dark mode';
+    button.setAttribute('aria-label', text);
+    button.title = text;
   }
 
   button.addEventListener('click', function () {

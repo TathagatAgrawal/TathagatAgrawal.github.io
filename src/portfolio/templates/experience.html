@@ -1,32 +1,42 @@
 {% extends "base.html" %}
 {% block content %}
   <h1>Experience</h1>
-  <p>Where I've worked and studied. The same information, condensed to one page, is in my <a href="/resume.pdf">resume (PDF)</a>.</p>
+  <p>Where I've worked and studied. The same information, condensed to one page, is in my <a href="/resume.pdf" target="_blank" rel="noopener">resume (PDF)</a>.</p>
 
-  <h2>Work</h2>
+  <p class="muted">Jump to: <a href="#work">Work</a> &middot; <a href="#education">Education</a>{% if certifications %} &middot; <a href="#certifications">Certifications</a>{% endif %}</p>
+
+  <h2 id="work">Work</h2>
   {%- for e in work %}
   <div class="entry" id="{{ e.key }}">
     <h3>{{ e.data.role }}, {{ e.data.organisation }}</h3>
     <p class="meta">{{ daterange(e.data.start, e.data.end) }}{% if e.data.location %} &middot; {{ e.data.location }}{% endif %}</p>
-    {%- if e.data.website and e.data.website.bullets %}
+    {%- if e.data.site_bullets() %}
     <ul>
-      {%- for b in e.data.website.bullets %}
+      {%- for b in e.data.site_bullets() %}
+      {%- if b is string %}
       <li>{{ inline(b) }}</li>
+      {%- else %}
+      <li>{{ inline(b.text) }}<ul>{% for sub in b.bullets %}<li>{{ inline(sub) }}</li>{% endfor %}</ul></li>
+      {%- endif %}
       {%- endfor %}
     </ul>
     {%- endif %}
   </div>
   {%- endfor %}
 
-  <h2>Education</h2>
+  <h2 id="education">Education</h2>
   {%- for e in education %}
   <div class="entry" id="{{ e.key }}">
     <h3>{{ e.data.role }}, {{ e.data.organisation }}</h3>
     <p class="meta">{{ daterange(e.data.start, e.data.end) }}{% if e.data.grade %} &middot; {{ e.data.grade }}{% endif %}</p>
-    {%- if e.data.website and e.data.website.bullets %}
+    {%- if e.data.site_bullets() %}
     <ul>
-      {%- for b in e.data.website.bullets %}
+      {%- for b in e.data.site_bullets() %}
+      {%- if b is string %}
       <li>{{ inline(b) }}</li>
+      {%- else %}
+      <li>{{ inline(b.text) }}<ul>{% for sub in b.bullets %}<li>{{ inline(sub) }}</li>{% endfor %}</ul></li>
+      {%- endif %}
       {%- endfor %}
     </ul>
     {%- endif %}
@@ -34,7 +44,7 @@
   {%- endfor %}
 
   {%- if certifications %}
-  <h2>Certifications</h2>
+  <h2 id="certifications">Certifications</h2>
   <ul>
     {%- for c in certifications %}
     <li>{% if c.url %}<a href="{{ c.url }}">{{ c.title }}</a>{% else %}{{ c.title }}{% endif %} <span class="muted">&middot; {{ c.issuer }}, {{ year(c.date) }}</span></li>

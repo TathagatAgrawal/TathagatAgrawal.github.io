@@ -4,7 +4,8 @@
 # used in their own `skills:` field, and the Skills page links every skill to that work
 # automatically. A skill nobody lists is shown without links.
 #
-# `resume` is the resume's "Technical Skills" section: free-text lines, with replacements per resume.
+# `resume_lines` (at the bottom) are the resume's "Technical Skills" lines: plain text, each written once.
+# A resume lists the ids of the lines it shows in content/config.yaml.
 
 groups:
   - id: llm
@@ -123,49 +124,49 @@ groups:
       - id: r
         name: R
 
-resume:
-  # Used by the ML resume, and by any resume without its own lines below.
-  default:
-    - label: Languages
-      skills: Python, C/C++, Java, JavaScript, R
-    - label: ML & Deep Learning
-      skills: PyTorch, TensorFlow, Keras, Scikit-Learn, HuggingFace Transformers, OpenCV, MLflow, XGBoost
-    - label: LLMs & NLP
-      skills: LangChain, LLaMA-Factory, OpenAI API, spaCy, NLTK
-    - label: Deployment & APIs
-      skills: FastAPI, Flask, REST APIs, Azure ML
-    - label: Data & Visualisation
-      skills: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel
-    - label: Developer and Agentic Tools
-      skills: Git, GitHub, Claude Code, Cursor, LaTeX
-  variants:
-    quant:
-      - label: Languages
-        skills: Python, C/C++, Java, JavaScript, R
-      - label: ML & Deep Learning
-        skills: PyTorch, TensorFlow, Keras, Scikit-Learn, HuggingFace Transformers, OpenCV, MLflow, XGBoost
-      - label: LLMs & NLP
-        skills: LangChain, LLaMA-Factory, OpenAI API, spaCy, NLTK
-      - label: Deployment & APIs
-        skills: FastAPI, Flask, REST APIs, Azure ML
-      - label: Data & Visualisation
-        skills: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel
-      - label: Developer Tools
-        skills: Git, GitHub, Claude Code, Cursor, LaTeX
-    general:
-      - label: Languages and tools
-        skills: Python, C/C++, Java, JavaScript, R; Git, GitHub, Claude Code, Cursor, LaTeX
-      - label: Generative AI and LLMs
-        skills: >-
-          LLM fine-tuning (SFT, LoRA), Retrieval-Augmented Generation (RAG), embeddings and vector
-          search (ChromaDB, Sentence-Transformers), prompt engineering, agentic AI and tool calling
-          (LangGraph, LangChain, ReAct), LLM evaluation, hallucination mitigation, OpenAI and Gemini
-          APIs, LLaMA-Factory
-      - label: ML and Deep Learning
-        skills: >-
-          PyTorch, TensorFlow, Keras, Scikit-Learn, XGBoost, HuggingFace Transformers,
-          learning-to-rank, NER, SHAP, OpenCV, spaCy, NLTK
-      - label: Deployment and MLOps
-        skills: FastAPI, Flask, REST APIs, Pydantic validation, MLflow, Azure ML, model monitoring
-      - label: Data and Visualisation
-        skills: Pandas, NumPy, data pipelines and feature engineering, Matplotlib, Seaborn, Power BI, Excel
+# The resume's "Technical Skills" lines, each written once. A resume in content/config.yaml lists the ids of the
+# lines it shows, in order (and can give a line a different label there). Plain text.
+resume_lines:
+  languages:
+    label: Languages
+    skills: Python, C/C++, Java, JavaScript, R
+  ml-dl:
+    label: ML & Deep Learning
+    skills: >-
+      PyTorch, TensorFlow, Keras, Scikit-Learn, HuggingFace Transformers, OpenCV, MLflow,
+      XGBoost
+  llm-nlp:
+    label: LLMs & NLP
+    skills: LangChain, LLaMA-Factory, OpenAI API, spaCy, NLTK
+  deployment:
+    label: Deployment & APIs
+    skills: FastAPI, Flask, REST APIs, Azure ML
+  data-viz:
+    label: Data & Visualisation
+    skills: Pandas, NumPy, Matplotlib, Seaborn, Power BI, Excel
+  dev-tools:
+    label: Developer and Agentic Tools
+    skills: Git, GitHub, Claude Code, Cursor, LaTeX
+  languages-and-tools:
+    label: Languages and tools
+    skills: Python, C/C++, Java, JavaScript, R; Git, GitHub, Claude Code, Cursor, LaTeX
+  generative-ai:
+    label: Generative AI and LLMs
+    skills: >-
+      LLM fine-tuning (SFT, LoRA), Retrieval-Augmented Generation (RAG), embeddings and vector
+      search (ChromaDB, Sentence-Transformers), prompt engineering, agentic AI and tool calling
+      (LangGraph, LangChain, ReAct), LLM evaluation, hallucination mitigation, OpenAI and Gemini
+      APIs, LLaMA-Factory
+  ml-and-dl:
+    label: ML and Deep Learning
+    skills: >-
+      PyTorch, TensorFlow, Keras, Scikit-Learn, XGBoost, HuggingFace Transformers,
+      learning-to-rank, NER, SHAP, OpenCV, spaCy, NLTK
+  deployment-mlops:
+    label: Deployment and MLOps
+    skills: FastAPI, Flask, REST APIs, Pydantic validation, MLflow, Azure ML, model monitoring
+  data-and-viz:
+    label: Data and Visualisation
+    skills: >-
+      Pandas, NumPy, data pipelines and feature engineering, Matplotlib, Seaborn, Power BI,
+      Excel

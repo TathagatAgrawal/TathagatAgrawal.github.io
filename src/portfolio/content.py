@@ -1,7 +1,9 @@
 """Load and validate everything in content/ into typed objects.
 
-The website build reads these objects. The resume templates read the same YAML files directly with
-Typst, so the models here also act as the schema that keeps those files readable by the resume.
+Projects, papers, theses and the profile are Markdown files: YAML frontmatter between `---` lines, then
+an optional Markdown body. Jobs and degrees, skills and certifications are YAML files. All text is
+Markdown. The website reads the objects made here as they are; the resumes get their data from
+`resume_data`, which applies each resume's overrides and converts the text for Typst.
 """
 
 from __future__ import annotations
@@ -77,7 +79,7 @@ class Link(Strict):
 
 
 class NestedBullet(Strict):
-    """A resume bullet with sub-bullets underneath it."""
+    """A bullet with sub-bullets underneath it."""
 
     text: str
     bullets: list[str]
@@ -87,7 +89,7 @@ Bullet = str | NestedBullet
 
 
 class ResumeOverride(Strict):
-    """Resume fields replaced for one resume variant (for example the one-page general resume)."""
+    """Fields replaced for one resume (for example the one-page general resume), written in Markdown."""
 
     title: str | None = None
     tech: str | None = None
@@ -97,18 +99,11 @@ class ResumeOverride(Strict):
     summary: str | None = None
 
 
-class ProjectWebsite(Strict):
-    """The website-only fields of a project; the page body lives in page.md beside project.yaml."""
-
-    summary: str
-    result: str | None = None
-    status: str = "Complete"
-    featured: bool = False
-    hidden: bool = False
-
-
 class ProjectResume(Strict):
-    """The resume-only fields of a project, written in Typst markup."""
+    """The resume-only fields of a project, in Markdown, with optional replacements per resume.
+
+    `title` and `link` apply to every resume; `variants.<resume>` replaces any of them for one resume.
+    """
 
     title: str | None = None
     tech: str | None = None
@@ -119,7 +114,7 @@ class ProjectResume(Strict):
 
 
 class ProjectFile(Strict):
-    """The contents of content/projects/<key>/project.yaml."""
+    """The frontmatter of content/projects/<key>/index.md; the page itself is the Markdown body."""
 
     title: str
     date: str
@@ -128,30 +123,34 @@ class ProjectFile(Strict):
     private: bool = False
     skills: list[str] = []
     links: list[Link] = []
-    website: ProjectWebsite | None = None
+    summary: str
+    result: str | None = None
+    status: str = "Complete"
     resume: ProjectResume | None = None
 
     _check_date = field_validator("date", mode="before")(check_date)
 
 
 class ExperienceWebsite(Strict):
-    """Website fields of a job or degree: a home-page summary, Markdown bullets, a related project."""
+    """Replacements used only on the website: use them when the website should say something different."""
 
-    summary: str | None = None
-    bullets: list[str] = []
-    project: str | None = None
+    bullets: list[Bullet] = []
 
 
 class ExperienceResume(Strict):
-    """Resume bullets of a job or degree, in Typst markup, with optional per-variant replacements."""
+    """Replacements used only on resumes, for every resume or (under `variants`) for one."""
 
     title: str | None = None
-    bullets: list[Bullet] = []
+    bullets: list[Bullet] | None = None
     variants: dict[str, ResumeOverride] = {}
 
 
 class ExperienceFile(Strict):
-    """The contents of content/experience/<key>.yaml."""
+    """The contents of content/experience/<key>.yaml.
+
+    `bullets` are shown on the website and on every resume. `website.bullets` and `resume.bullets` replace
+    them on that side only, and `resume.variants.<resume>.bullets` for one resume.
+    """
 
     type: Literal["work", "education"]
     role: str
@@ -160,40 +159,90 @@ class ExperienceFile(Strict):
     start: str
     end: str | None = None
     grade: str | None = None
-    thesis: str | None = None
     skills: list[str] = []
+    summary: str | None = None
+    bullets: list[Bullet] = []
     website: ExperienceWebsite | None = None
     resume: ExperienceResume | None = None
 
     _check_dates = field_validator("start", "end", mode="before")(check_date)
 
+    def site_bullets(self) -> list[Bullet]:
+        """The bullets the website shows: its own if given, otherwise the shared ones."""
+        return self.website.bullets if self.website and self.website.bullets else self.bullets
 
-class PublicationWebsite(Strict):
-    """Website fields of a paper."""
+    def resume_bullets(self, name: str) -> list[Bullet]:
+        """The bullets one resume shows: that resume's own, else the resumes' own, else the shared ones."""
+        if self.resume:
+            variant = self.resume.variants.get(name)
+            if variant and variant.bullets is not None:
+                return variant.bullets
+            if self.resume.bullets is not None:
+                return self.resume.bullets
+        return self.bullets
 
-    summary: str | None = None
-    project: str | None = None
+    def resume_title(self, name: str) -> str:
+        """The heading one resume shows: that resume's own, else the resumes' own, else the role."""
+        if self.resume:
+            variant = self.resume.variants.get(name)
+            if variant and variant.title:
+                return variant.title
+            if self.resume.title:
+                return self.resume.title
+        return self.role
 
 
 class PublicationResume(Strict):
-    """Resume fields of a paper: a shorter title if needed, and a note after the citation (Typst markup)."""
+    """Resume fields of a paper: a shorter title if needed, and a note after the citation (Markdown)."""
 
     title: str | None = None
     note: str | None = None
 
 
 class Publication(Strict):
-    """One paper in content/publications.yaml."""
+    """The frontmatter of content/research/<key>/index.md; the key is the folder name and the body is the overview."""
 
-    key: str
+    key: str = ""
+    body: str = ""  # the Markdown below the frontmatter, filled in by the loader
     authors: list[str]
     year: int
     title: str
     venue: str
     url: str | None = None
     url_label: str = "Paper link"
-    website: PublicationWebsite = PublicationWebsite()
+    summary: str | None = None
+    project: str | None = None  # the project page about it
+    thesis: str | None = None  # the thesis it came from
     resume: PublicationResume = PublicationResume()
+
+    @property
+    def page(self) -> bool:
+        """True when the paper has an overview page: some text below the frontmatter."""
+        return bool(self.body.strip())
+
+
+class Thesis(Strict):
+    """The frontmatter of a thesis in content/research/<key>/index.md (marked `kind: thesis`).
+
+    `degree` is the key of the education entry in content/experience/ that it was written for, which
+    supplies the degree, the university and the year. The key and the body are filled in by the loader.
+    """
+
+    kind: Literal["thesis"]
+    key: str = ""
+    body: str = ""
+    title: str
+    degree: str
+    repository: str | None = None
+    private: bool = False
+    skills: list[str] = []
+    links: list[Link] = []
+    summary: str
+
+    @property
+    def page(self) -> bool:
+        """True when the thesis has a page: some text below the frontmatter."""
+        return bool(self.body.strip())
 
 
 class Certification(Strict):
@@ -223,36 +272,24 @@ class SkillGroup(Strict):
 
 
 class ResumeSkillLine(Strict):
-    """One "Label: skills" line in a resume's skills section."""
+    """One "Label: skills" line of a resume's Technical Skills section, in plain text."""
 
     label: str
     skills: str
 
 
-class ResumeSkills(Strict):
-    """The resume's skills lines, with optional replacements per variant."""
-
-    default: list[ResumeSkillLine]
-    variants: dict[str, list[ResumeSkillLine]] = {}
-
-
 class SkillsFile(Strict):
-    """The contents of content/skills.yaml."""
+    """The contents of content/skills.yaml: the website's skill groups and the resume's skill lines.
+
+    Each resume line is written once, under an id; the resumes in content/config.yaml pick and order them.
+    """
 
     groups: list[SkillGroup]
-    resume: ResumeSkills
-
-
-class ProfileWebsite(Strict):
-    """Website-only profile text (Markdown)."""
-
-    headline: str
-    intro: str
-    status: str
+    resume_lines: dict[str, ResumeSkillLine]
 
 
 class ProfileResume(Strict):
-    """Resume-only profile text (Typst markup) and which contact links go in the resume header."""
+    """Resume-only profile text (Markdown) and which contact links go in the resume header."""
 
     summary: str
     header_links: list[Literal["email", "github", "linkedin", "website"]] = ["email", "github", "linkedin"]
@@ -268,13 +305,15 @@ class ProfileLinks(Strict):
 
 
 class Profile(Strict):
-    """The contents of content/profile.yaml. Phone number and street address never go here."""
+    """The frontmatter of content/index.md. Phone number and street address never go here."""
 
     name: str
     email: str
     location: str
     links: ProfileLinks
-    website: ProfileWebsite
+    headline: str  # the large line at the top of the home page
+    intro: str = ""  # filled in from the Markdown body of content/index.md
+    status: str  # Markdown: current role and availability
     resume: ProfileResume
 
 
@@ -285,30 +324,83 @@ class Category(Strict):
     name: str
 
 
+Section = Literal["summary", "skills", "experience", "projects", "publications", "education", "certifications"]
+LENGTH = re.compile(r"^\d+(\.\d+)?(pt|in|mm|cm|em)$")
+
+
+class ResumeLayout(Strict):
+    """Optional size overrides for one resume; each is a Typst length such as 0.4in, 16pt or 0.45em."""
+
+    margin: str | None = None
+    gap: str | None = None
+    name_size: str | None = None
+    font_size: str | None = None
+
+    @field_validator("*", mode="before")
+    @classmethod
+    def _check_length(cls, value: object) -> object:
+        """Require a number with a unit, which is what Typst needs."""
+        if value is not None and not LENGTH.match(str(value)):
+            raise ValueError(f"expected a length with a unit such as 0.4in, 16pt or 0.45em, got {value!r}")
+        return str(value) if value is not None else None
+
+
+class SkillLineRef(Strict):
+    """A resume skill line picked by id, with a different label for this resume."""
+
+    line: str
+    label: str | None = None
+
+
+class ResumeConfig(Strict):
+    """One resume: its sections in order, and the keys of the jobs, projects and papers under them."""
+
+    sections: list[Section]
+    skills: list[str | SkillLineRef] = []  # ids of the lines in content/skills.yaml, in order
+    experience: list[str] = []
+    education: list[str] = []
+    projects: list[str] = []
+    other_projects: list[str] = []
+    publications: list[str] = []
+    layout: ResumeLayout = ResumeLayout()
+
+
+class WebsiteConfig(Strict):
+    """What the website shows: its projects, the featured ones in order, and the resume it publishes."""
+
+    projects: list[str]
+    featured: list[str] = []
+    resume: str
+
+
 class SiteFile(Strict):
-    """The contents of content/site.yaml."""
+    """The contents of content/config.yaml: the one file that decides what appears on the website and resumes."""
 
     title: str
     description: str
     url: str
+    home_title: str
+    descriptions: dict[str, str] = {}
     categories: list[Category]
-    featured_count: int = 3
-    published_resume: str = "general"
+    website: WebsiteConfig
+    resumes: dict[str, ResumeConfig]
 
 
 @dataclass
 class Project:
-    """A project folder: its key, validated project.yaml and the path of its page.md, if any."""
+    """A project folder: its key, the validated frontmatter of index.md and that file's Markdown body."""
 
     key: str
     dir: Path
     data: ProjectFile
-    page: Path | None
+    path: Path
+    body: str
+    visible: bool = False  # listed under website.projects in content/config.yaml
 
     @property
-    def visible(self) -> bool:
-        """True when the project appears on the published website."""
-        return self.data.website is not None and not self.data.website.hidden
+    def page(self) -> bool:
+        """True when the project has a web page: some text below the frontmatter."""
+        return bool(self.body.strip())
 
 
 @dataclass
@@ -332,6 +424,7 @@ class Content:
     publications: list[Publication]
     certifications: list[Certification]
     pages: dict[str, Path] = field(default_factory=dict)
+    theses: list[Thesis] = field(default_factory=list)
 
     def skill_names(self) -> dict[str, str]:
         """Map every website skill id to its display name."""
@@ -340,16 +433,48 @@ class Content:
 
 def _read_yaml(path: Path) -> object:
     """Parse a YAML file, turning syntax errors into a ContentError that names the file and line."""
+    return _parse_yaml(path.read_text(encoding="utf-8"), path)
+
+
+def _parse_yaml(text: str, path: Path, line_offset: int = 0) -> object:
+    """Parse YAML text; line_offset is the number of lines above it in the file, so errors name the right line."""
     try:
-        return yaml.safe_load(path.read_text(encoding="utf-8"))
+        return yaml.safe_load(text)
     except yaml.YAMLError as exc:
         mark = getattr(exc, "problem_mark", None)
-        where = f"{path}:{mark.line + 1}" if mark else str(path)
+        where = f"{path}:{mark.line + 1 + line_offset}" if mark else str(path)
         problem = getattr(exc, "problem", None) or str(exc)
         hint = ""
         if "alias" in str(problem) or "anchor" in str(problem):
             hint = " (a value starting with * or & must be wrapped in quotes)"
         raise ContentError(f"{where}: YAML syntax error: {problem}{hint}") from exc
+
+
+def split_entry(text: str, path: Path) -> tuple[object, str]:
+    """Split a Markdown file into its parsed YAML frontmatter and its body.
+
+    The file starts with a `---` line; the frontmatter ends at the next line that is only `---`. The
+    body is padded with blank lines to the frontmatter's height, so that a line number reported while
+    rendering it is the line number in the file.
+    """
+    if not text.startswith("---\n"):
+        raise ContentError(f"{path}:1: expected the file to start with a --- line and YAML frontmatter")
+    end = text.find("\n---\n", 3)
+    if end == -1 and text.endswith("\n---"):
+        end = len(text) - 4
+    if end == -1:
+        raise ContentError(f"{path}: the frontmatter is never closed; add a line containing only ---")
+    front = text[4:end]
+    body = text[end + 5 :]
+    data = _parse_yaml(front, path, line_offset=1)
+    if data is None:
+        data = {}  # an empty frontmatter reports the missing fields instead of being skipped
+    return data, "\n" * (text[: end + 5].count("\n")) + body
+
+
+def _read_entry(path: Path) -> tuple[object, str]:
+    """Read a Markdown file and split it into frontmatter data and body."""
+    return split_entry(path.read_text(encoding="utf-8"), path)
 
 
 def _split_bullets(data: object, where: str = "") -> list[str]:
@@ -404,35 +529,63 @@ def load(root: Path) -> Content:
             errors.append(str(exc))
             return None
 
-    site = attempt(lambda: _parse(SiteFile, _read_yaml(base / "site.yaml"), base / "site.yaml"))
-    profile = attempt(lambda: _parse(Profile, _read_yaml(base / "profile.yaml"), base / "profile.yaml"))
+    site = attempt(lambda: _parse(SiteFile, _read_yaml(base / "config.yaml"), base / "config.yaml"))
+    shown = set(site.website.projects) if site else set()
     skills = attempt(lambda: _parse(SkillsFile, _read_yaml(base / "skills.yaml"), base / "skills.yaml"))
 
-    def load_list[M: BaseModel](model: type[M], name: str) -> list[M]:
-        """Load a YAML file that holds a list of entries of one model."""
-        path = base / name
+    def load_profile() -> Profile:
+        """Load content/index.md: the frontmatter is the profile and the body is the home-page intro."""
+        path = base / "index.md"
+        data, body = _read_entry(path)
+        if isinstance(data, dict) and body.strip():
+            data["intro"] = body.strip()
+        return _parse(Profile, data, path)
+
+    profile = attempt(load_profile)
+
+    def load_certifications() -> list[Certification]:
+        """Load the list in certifications.yaml."""
+        path = base / "certifications.yaml"
         data = _read_yaml(path)
         if not isinstance(data, list):
             raise ContentError(f"{path}: expected a list of entries")
-        out = []
-        for i, item in enumerate(data):
-            out.append(_parse(model, item, Path(f"{path} (entry {i + 1})")))
-        return out
+        return [_parse(Certification, item, Path(f"{path} (entry {i + 1})")) for i, item in enumerate(data)]
 
-    publications = attempt(load_list, Publication, "publications.yaml") or []
-    certifications = attempt(load_list, Certification, "certifications.yaml") or []
+    certifications = attempt(load_certifications) or []
+
+    publications: list[Publication] = []
+    theses: list[Thesis] = []
+    for path in sorted((base / "research").glob("*/index.md")):
+        entry = attempt(lambda p=path: _read_entry(p))
+        if entry is None:
+            continue
+        data = entry[0]
+        if isinstance(data, dict):
+            data["key"] = path.parent.name
+            data["body"] = entry[1]
+        if isinstance(data, dict) and "kind" in data:
+            thesis = attempt(lambda p=path, d=data: _parse(Thesis, d, p))
+            if thesis is not None:
+                theses.append(thesis)
+            continue
+        pub = attempt(lambda p=path, d=data: _parse(Publication, d, p))
+        if pub is not None:
+            publications.append(pub)
+    # Newest first; papers from the same year in alphabetical order of their file names.
+    publications.sort(key=lambda pub: (-pub.year, pub.key))
 
     projects: dict[str, Project] = {}
     for folder in sorted(p for p in (base / "projects").iterdir() if p.is_dir()):
-        yaml_path = folder / "project.yaml"
-        if not yaml_path.exists():
-            errors.append(f"{folder}: missing project.yaml")
+        md_path = folder / "index.md"
+        if not md_path.exists():
+            errors.append(f"{folder}: missing index.md")
             continue
-        data = attempt(lambda p=yaml_path: _parse(ProjectFile, _read_yaml(p), p))
-        if data is None:
+        entry = attempt(lambda p=md_path: _read_entry(p))
+        if entry is None:
             continue
-        page = folder / "page.md"
-        projects[folder.name] = Project(folder.name, folder, data, page if page.exists() else None)
+        data = attempt(lambda p=md_path, e=entry: _parse(ProjectFile, e[0], p))
+        if data is not None:
+            projects[folder.name] = Project(folder.name, folder, data, md_path, entry[1], folder.name in shown)
 
     experience: dict[str, Experience] = {}
     for path in sorted((base / "experience").glob("*.yaml")):
@@ -445,13 +598,13 @@ def load(root: Path) -> Content:
     if errors or site is None or profile is None or skills is None:
         raise ContentError("\n".join(errors).replace(f"{root}/", ""))
 
-    content = Content(root, site, profile, skills, projects, experience, publications, certifications, pages)
+    content = Content(root, site, profile, skills, projects, experience, publications, certifications, pages, theses)
     _cross_check(content)
     return content
 
 
 def _cross_check(content: Content) -> None:
-    """Check references between files: categories, skill ids, featured count and publication links."""
+    """Check references between files: categories, skill ids, publication links and content/config.yaml."""
     errors: list[str] = []
     categories = {c.id for c in content.site.categories}
     skill_ids = set(content.skill_names())
@@ -471,32 +624,111 @@ def _cross_check(content: Content) -> None:
                 errors.append(f"{where}: skills: unknown skill {sid!r}{hint}")
 
     for p in content.projects.values():
-        where = f"content/projects/{p.key}/project.yaml"
+        where = f"content/projects/{p.key}/index.md"
         if p.data.category not in categories:
-            errors.append(f"{where}: category: {p.data.category!r} is not defined in content/site.yaml")
+            errors.append(f"{where}: category: {p.data.category!r} is not defined in content/config.yaml")
         check_skills(where, p.data.skills)
-        if p.data.website is None and p.data.resume is None:
-            errors.append(f"{where}: needs a website: part, a resume: part, or both")
         if p.data.repository and "/" in p.data.repository:
             errors.append(
                 f"{where}: repository: give the repository name only, e.g. {p.data.repository.split('/')[-1]!r}"
             )
     for e in content.experience.values():
         check_skills(f"content/experience/{e.key}.yaml", e.data.skills)
-        if e.data.website and e.data.website.project and e.data.website.project not in content.projects:
-            errors.append(f"content/experience/{e.key}.yaml: website.project: no project {e.data.website.project!r}")
 
-    featured = [p.key for p in content.projects.values() if p.visible and p.data.website and p.data.website.featured]
-    if len(featured) > content.site.featured_count:
-        errors.append(
-            f"content/site.yaml: featured_count is {content.site.featured_count} but "
-            f"{len(featured)} projects are featured: {', '.join(featured)}"
-        )
+    _check_config(content, errors)
+    degrees_by_key = {k: e for k, e in content.experience.items() if e.data.type == "education"}
+    thesis_keys = {t.key for t in content.theses}
+    for t in content.theses:
+        where = f"content/research/{t.key}/index.md"
+        check_skills(where, t.skills)
+        if t.degree not in degrees_by_key:
+            close = _closest(t.degree, set(degrees_by_key))
+            hint = f" (did you mean {close!r}?)" if close else ""
+            errors.append(f"{where}: degree: no education entry {t.degree!r} in content/experience/{hint}")
+        if t.repository and "/" in t.repository:
+            errors.append(f"{where}: repository: give the repository name only, e.g. {t.repository.split('/')[-1]!r}")
     for pub in content.publications:
-        if pub.website.project and pub.website.project not in content.projects:
-            errors.append(f"content/publications.yaml: {pub.key}: website.project: no project {pub.website.project!r}")
+        if pub.thesis and pub.thesis not in thesis_keys:
+            errors.append(f"content/research/{pub.key}/index.md: thesis: no thesis {pub.thesis!r}")
+        if pub.project and pub.project not in content.projects:
+            errors.append(f"content/research/{pub.key}/index.md: project: no project {pub.project!r}")
     if errors:
         raise ContentError("\n".join(sorted(errors)))
+
+
+def _check_config(content: Content, errors: list[str]) -> None:
+    """Check that content/config.yaml names real projects, jobs and papers, and that each resume is consistent."""
+    where = "content/config.yaml"
+    cfg = content.site
+    publications = {pub.key for pub in content.publications}
+
+    def check_keys(label: str, keys: list[str], known: set[str], kind: str) -> None:
+        """Report keys that name nothing (suggesting the closest one) and keys listed twice."""
+        for key in keys:
+            if key not in known:
+                close = _closest(key, known)
+                hint = f" (did you mean {close!r}?)" if close else ""
+                errors.append(f"{where}: {label}: no {kind} {key!r}{hint}")
+        for dup in sorted({k for k in keys if keys.count(k) > 1}):
+            errors.append(f"{where}: {label}: {dup!r} is listed more than once")
+
+    known_pages = {"projects", "experience", "skills", "research", *content.pages}
+    for key in cfg.descriptions:
+        if key not in known_pages:
+            close = _closest(key, known_pages)
+            hint = f" (did you mean {close!r}?)" if close else ""
+            errors.append(f"{where}: descriptions: {key!r} is not a page{hint}")
+    web = cfg.website
+    check_keys("website.projects", web.projects, set(content.projects), "project")
+    check_keys("website.featured", web.featured, set(web.projects), "project in website.projects")
+    if web.resume not in cfg.resumes:
+        errors.append(f"{where}: website.resume: no resume {web.resume!r} under resumes:")
+
+    has_resume = {k for k, p in content.projects.items() if p.data.resume is not None}
+    jobs = {k for k, e in content.experience.items() if e.data.type == "work"}
+    degrees = {k for k, e in content.experience.items() if e.data.type == "education"}
+    skill_lines = set(content.skills.resume_lines)
+    for name, r in cfg.resumes.items():
+        if not re.fullmatch(r"[a-z0-9][a-z0-9_-]*", name):
+            errors.append(f"{where}: resumes.{name}: use lowercase letters, digits, - and _ in a resume's name")
+        label = f"resumes.{name}"
+        check_keys(f"{label}.projects", r.projects, has_resume, "project with a resume: part")
+        check_keys(f"{label}.other_projects", r.other_projects, has_resume, "project with a resume: part")
+        check_keys(f"{label}.experience", r.experience, jobs, "job")
+        check_keys(f"{label}.education", r.education, degrees, "degree")
+        line_ids = [x if isinstance(x, str) else x.line for x in r.skills]
+        check_keys(f"{label}.skills", line_ids, skill_lines, "skill line in content/skills.yaml")
+        check_keys(f"{label}.publications", r.publications, publications, "paper")
+        check_keys(f"{label}.sections", list(r.sections), set(Section.__args__), "section")
+        for section, keys in [
+            ("skills", line_ids),
+            ("experience", r.experience),
+            ("education", r.education),
+            ("projects", r.projects),
+            ("publications", r.publications),
+        ]:
+            if section in r.sections and not keys:
+                errors.append(f"{where}: {label}: has a {section!r} section but {section}: is empty")
+            if keys and section not in r.sections:
+                errors.append(f"{where}: {label}: lists {section}: but has no {section!r} section in sections:")
+        if r.other_projects and "projects" not in r.sections:
+            errors.append(f"{where}: {label}: lists other_projects: but has no 'projects' section in sections:")
+
+    def check_variants(file: str, variants: dict[str, object]) -> None:
+        """Report variant names that are not a resume in config.yaml, which would never be used."""
+        for variant in variants:
+            if variant not in cfg.resumes:
+                close = _closest(variant, set(cfg.resumes))
+                hint = f" (did you mean {close!r}?)" if close else ""
+                errors.append(f"{file}: resume.variants: {variant!r} is not a resume in {where}{hint}")
+
+    for key, p in content.projects.items():
+        if p.data.resume:
+            check_variants(f"content/projects/{key}/index.md", p.data.resume.variants)
+    for key, e in content.experience.items():
+        if e.data.resume:
+            check_variants(f"content/experience/{key}.yaml", e.data.resume.variants)
+    check_variants("content/index.md", content.profile.resume.variants)
 
 
 def _closest(word: str, options: set[str]) -> str | None:

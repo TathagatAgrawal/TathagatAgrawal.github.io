@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block content %}
+  <p class="meta"><a href="/research/">Research</a></p>
+  <h1>{{ t.title }}</h1>
+  <p>{{ inline(t.summary) }}</p>
+  <p class="meta">
+    {{- "Thesis" }} &middot; <a href="/experience/#{{ degree.key }}">{{ degree.data.role }}</a>, {{ degree.data.organisation }}, {{ year(degree.data.end) }}
+    {%- if source %} &middot; <a href="{{ source }}">Source on GitHub</a>{% elif t.repository %} &middot; Private repository, walkthrough on request{% endif %}
+    {%- for l in t.links %} &middot; <a href="{{ l.url }}">{{ l.label }}</a>{% endfor %}</p>
+
+  {{ body }}
+
+  {%- if built_with %}
+  <h2>Built with</h2>
+  <p>{% for sid, name in built_with %}<a href="/skills/#{{ sid }}">{{ name }}</a>{% if not loop.last %}, {% endif %}{% endfor %}</p>
+  {%- endif %}
+{% endblock %}

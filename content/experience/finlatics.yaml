@@ -6,13 +6,14 @@ start: 2024-05
 end: 2024-05
 skills: [data-cleaning, python, excel]
 
+# Markdown. Shown on the website and on every resume, unless replaced below.
+bullets:
+  - Conducted case studies on data-driven decision-making.
+  - Automated data cleaning pipelines with Python scripts, significantly reducing processing time.
+  - Facilitated data-driven reporting to senior leadership.
+
 website:
+  # Replaces the bullets above on the website only (delete to use the shared ones).
   bullets:
     - Automated data-cleaning pipelines with Python scripts, significantly reducing processing time.
     - Ran case studies on data-driven decision making and prepared reporting for senior leadership.
-
-resume:
-  bullets:
-    - Conducted case studies on data-driven decision-making.
-    - Automated data cleaning pipelines with Python scripts, significantly reducing processing time.
-    - Facilitated data-driven reporting to senior leadership.

@@ -1,0 +1,120 @@
+# The one place that decides what appears where: the website and every resume.
+#
+# Projects, jobs and papers are written once, in their own files in content/. This file only names them
+# (by key: the folder name of a project or paper, or a job's file name without .yaml), in the order shown.
+# To add something to the website or a resume, add its key here; to drop it, remove the key.
+
+title: Tathagat Agrawal
+description: Applied ML scientist building LLM, retrieval and ranking systems, and measuring them honestly.
+url: https://tathagatagrawal.github.io
+
+# What search engines show. `home_title` is the home page's <title> (keep it to about 60 characters). `descriptions`
+# gives each page that has no summary of its own a unique <meta description> (70 to 160 characters); projects, papers
+# and the thesis use their own `summary`. The build warns about missing, duplicate or badly sized ones.
+home_title: Tathagat Agrawal – Applied ML Scientist (LLMs, RAG, ranking)
+descriptions:
+  projects: "Projects by Tathagat Agrawal: LLM and retrieval systems, quantitative trading tools and everyday software, each with the problem, the build and the result."
+  experience: "Work experience and education of Tathagat Agrawal: Applied Scientist at Neural Nurture, an integrated M.Tech. in AI from VIT Bhopal, and certifications."
+  skills: "Skills of Tathagat Agrawal across LLMs, machine learning, quantitative finance and software engineering, each linked to the projects where it was used."
+  research: "Peer-reviewed papers by Tathagat Agrawal on grokking in neural networks and multilingual named entity recognition, and a master's thesis on grokking."
+  contact: "Contact Tathagat Agrawal about ML roles or freelance projects: email, LinkedIn and GitHub, and how a freelance project works."
+
+# Project groups on the Projects page, in display order. Each project's `category` is one of these ids.
+categories:
+  - id: llm
+    name: LLMs and retrieval
+  - id: quant
+    name: Quantitative finance
+  - id: tools
+    name: Software for everyday use
+  - id: ml
+    name: Deep learning and classic ML
+  - id: research
+    name: Papers in progress
+  - id: practice
+    name: Practice and small programs
+
+website:
+  # Projects on the published website. A project not listed here has no page and is not linked.
+  # They are shown under their category, newest first. `uv run build --serve --drafts` shows the
+  # unlisted ones too, marked as hidden, so you can review them.
+  projects:
+    # LLMs and retrieval
+    - anuchhed
+    - clinic-agent
+    - agentic-eval-framework
+    - legal-rag
+    - mbert-ner
+    # Quantitative finance
+    - trade-filter-ml
+    - backtest-lab
+    - strategy-backtester
+    # Software for everyday use
+    - itr-fetch
+    - invoice-generator
+    - nse-data-fetcher
+    # Deep learning and classic ML
+    - stellar-classification
+    - unet-segmentation
+    - crop-disease
+
+  # The projects on the home page, in this order. Each must also be listed in `projects` above.
+  featured:
+    - anuchhed
+    - agentic-eval-framework
+    - trade-filter-ml
+
+  # Which of the resumes below is published as /resume.pdf.
+  resume: general
+
+# Every resume, built by `uv run resume` into resume/<name>.pdf. Each one lists the sections it shows, in
+# order, and which jobs, projects and papers go under them (in the order given). To add a resume, add an
+# entry here. Text that differs between resumes lives in the `resume.variants.<name>` part of an entry's file.
+resumes:
+  # One page. Published on the website as /resume.pdf.
+  general:
+    sections: [summary, skills, experience, projects, publications, education]
+    skills: [languages-and-tools, generative-ai, ml-and-dl, deployment-mlops, data-and-viz]
+    experience: [neural-nurture]
+    projects: [agentic-eval-framework, ai-clinic-scheduler, strategy-backtester]
+    other_projects: [unet-segmentation, stellar-classification]  # one line each, under "Other projects"
+    publications: [grokking-review, grokking-rigidity, mbert-ner]
+    education: [vit-bhopal]
+    layout: { margin: 0.4in, gap: 0.45em }
+
+  # Two pages, for ML, NLP and LLM roles.
+  ml:
+    sections: [summary, experience, publications, skills, education, projects, certifications]
+    skills: [languages, ml-dl, llm-nlp, deployment, data-viz, dev-tools]
+    experience: [neural-nurture, finlatics]
+    projects:
+      - agentic-eval-framework
+      - ai-clinic-scheduler
+      - mbert-ner
+      - strategy-backtester
+      - stellar-classification
+      - unet-segmentation
+    publications: [grokking-review, grokking-rigidity, mbert-ner]
+    education: [vit-bhopal]
+
+  # Two pages, for quantitative research and trading roles.
+  quant:
+    sections: [summary, experience, publications, skills, education, projects, certifications]
+    skills:
+      - languages
+      - ml-dl
+      - llm-nlp
+      - deployment
+      - data-viz
+      - {line: dev-tools, label: Developer Tools}  # the same skills as the ml resume, under a different label
+    experience: [neural-nurture, finlatics]
+    projects:
+      - strategy-backtester
+      - ai-clinic-scheduler
+      - mbert-ner
+      - stellar-classification
+      - unet-segmentation
+      - crop-disease
+    publications: [grokking-review, grokking-rigidity, mbert-ner]
+    education: [vit-bhopal]
+    layout: { name_size: 16pt }

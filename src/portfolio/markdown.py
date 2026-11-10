@@ -238,6 +238,14 @@ def _table_close(self: RendererHTML, tokens: list[Token], idx: int, options: dic
     return self.renderToken(tokens, idx, options, env) + "</div>"
 
 
+def _link_open(self: RendererHTML, tokens: list[Token], idx: int, options: dict, env: dict) -> str:
+    """Open links to PDF files in a new tab, so the reader keeps the site and has it to come back to."""
+    if (tokens[idx].attrGet("href") or "").lower().endswith(".pdf"):
+        tokens[idx].attrSet("target", "_blank")
+        tokens[idx].attrSet("rel", "noopener")
+    return self.renderToken(tokens, idx, options, env)
+
+
 def _parser() -> MarkdownIt:
     """Create the Markdown parser with tables, figures and CSV table blocks enabled."""
     md = MarkdownIt("commonmark", {"html": True, "typographer": True}).enable(
@@ -247,6 +255,7 @@ def _parser() -> MarkdownIt:
     md.add_render_rule("fence", _fence)
     md.add_render_rule("table_open", _table_open)
     md.add_render_rule("table_close", _table_close)
+    md.add_render_rule("link_open", _link_open)
     return md
 
 
@@ -256,7 +265,7 @@ _MD = _parser()
 def render_page(text: str, source: Path, base_dir: Path, *, allow_h1: bool = False) -> tuple[str, RenderEnv]:
     """Render a whole Markdown document; problems are collected in the returned RenderEnv.
 
-    Project pages get their title from project.yaml, so a # heading there is an error; standalone
+    Project pages get their title from the frontmatter of index.md, so a # heading there is an error; standalone
     pages such as contact.md bring their own (allow_h1=True).
     """
     env = RenderEnv(source=source, base_dir=base_dir, allow_h1=allow_h1)
