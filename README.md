@@ -314,7 +314,7 @@ It only warns (the site still builds) about search-engine problems: a page with 
 
 **After the site is live** (nothing can appear in search results before that):
 
-1. Add the site in [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit `https://tathagatagrawal.github.io/sitemap.xml`.
+1. Add the site in [Google Search Console](https://search.google.com/search-console) and [Bing Webmaster Tools](https://www.bing.com/webmasters) and submit `https://tathagatagrawal.github.io/sitemap.xml`. Search Console's verification file (`google….html`) lives in `src/portfolio/static/`, which the build copies to the site's root; don't delete it, because Google re-checks it.
 2. Link to the site from the places search engines already trust: the website field of your GitHub and LinkedIn profiles, Hugging Face, each repository's README, and your papers' publisher pages. Links from other sites are what make a site appear when someone searches your name.
 3. Check a page with Google's [Rich Results Test](https://search.google.com/test/rich-results) and [PageSpeed Insights](https://pagespeed.web.dev/).
 
