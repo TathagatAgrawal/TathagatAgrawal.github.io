@@ -342,6 +342,10 @@ A symlink would not work for the iCloud copy: iCloud stores a link as a path on 
 2. Link to the site from the places search engines already trust: the website field of your GitHub and LinkedIn profiles, Hugging Face, each repository's README, and your papers' publisher pages. Links from other sites are what make a site appear when someone searches your name.
 3. Check a page with Google's [Rich Results Test](https://search.google.com/test/rich-results) and [PageSpeed Insights](https://pagespeed.web.dev/).
 
+## License
+
+The **code** (the site and resume builders, templates, stylesheet, Typst layout, tests and workflow) is under the [MIT License](LICENSE): you are free to use, copy, modify and distribute it. My **content** is not: everything in `content/` and the resumes in `resume/*.pdf` are all rights reserved, as set out in [LICENSE-CONTENT.md](LICENSE-CONTENT.md). To build your own site with this code, replace everything in `content/` (and the resumes) with your own; the schema is described above.
+
 ## Publishing
 
 Every push to `main` runs `.github/workflows/publish.yml` (which fetches the full Git history, for the sitemap's dates): it builds the site and the general resume, runs the tests, and deploys to GitHub Pages. GitHub Pages is free only for public repositories, so while this repository is private the deploy step is skipped and the workflow only checks the build.
