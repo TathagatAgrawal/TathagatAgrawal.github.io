@@ -357,6 +357,18 @@ To go live:
 3. Push any commit (or re-run the workflow). The site appears at `https://tathagatagrawal.github.io`.
 4. Add `website` to `header_links` in `content/index.md` to put the site's link on the resumes.
 
+## Who can change this repository
+
+Anyone can read and fork the repository, but only the owner can change it, and a change to `main` is what changes the website and the resumes. These protections are set on GitHub (Settings), not in the files, so they are listed here:
+
+- **No other collaborators.** Others contribute only by forking and opening a pull request, which changes nothing until the owner merges it. The deploy job runs only on a push to `main`, never on a pull request.
+- **A rule on `main`** (Settings → Rules → Rulesets → "Protect main"): `main` can't be deleted or force-pushed, and a change has to pass the `build` check. The repository's admin (the owner) can bypass it, so pushing straight to `main` still works.
+- **Workflow safety.** The workflow token is read-only, Actions can't approve pull requests, and workflows from a fork need the owner's approval for every outside contributor.
+- **Updates through review.** Dependabot opens pull requests for new versions of the GitHub Actions and Python dependencies, and the one third-party action (`astral-sh/setup-uv`) is pinned to an exact commit. Security alerts, security updates, secret scanning and push protection are on.
+- **The account itself** has two-factor authentication. Keep it that way, and review the SSH keys, access tokens and authorised apps in GitHub's account settings now and then.
+
+When you merge a pull request, read any change to `src/` or `.github/` closely: that code runs in the build.
+
 ## Privacy
 
 Phone number and street address are never written anywhere in this repository; the resumes show email, GitHub and LinkedIn only. `private/` is gitignored, and the build plus the pre-commit hook refuse to proceed if a phone number appears in any file that would be committed.
