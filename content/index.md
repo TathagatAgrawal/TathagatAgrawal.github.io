@@ -21,9 +21,8 @@ status: >-
 
 resume:
   # Which contact links appear in the resume header, in order: email, github, linkedin, website.
-  # Add `website` once the site is public.
-  header_links: [email, github, linkedin]
-  # Typst markup. The paragraph under the resume header.
+  header_links: [email, github, linkedin, website]
+  # Markdown. The paragraph under the resume header.
   summary: >-
     Applied ML researcher and scientist building end-to-end production AI systems: LLM
     fine-tuning, RAG, agentic tool-calling, evaluation frameworks, multi-task NER and
