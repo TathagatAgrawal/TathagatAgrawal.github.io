@@ -18,7 +18,7 @@ from pathlib import Path
 
 from . import checks
 from .content import ContentError, load
-from .resume import build_pdf, file_name, write_if_changed
+from .resume import available_fonts, build_pdf, compile_resume, file_name, write_if_changed
 from .site import build_site
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -27,12 +27,18 @@ WATCHED = ["content", "resume", "src/portfolio"]
 DEFAULT_COPY_DIR = Path.home() / "Library" / "Mobile Documents" / "com~apple~CloudDocs" / "Resumes"
 
 
-def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True) -> bool:
+def run_build(
+    out: Path, *, drafts: bool, shown_as: Path | None = None, check_pdfs: bool = True, ci: bool = False
+) -> bool:
     """Validate everything, build the site into out/ and print problems. Returns True on success.
 
-    shown_as is the folder to name in the final message when out/ is only a staging folder. check_pdfs
-    warns about committed resume PDFs that no longer match the content (the dev server turns it off, since
-    they are naturally out of date while you edit).
+    shown_as is the folder to name in the final message when out/ is only a staging folder.
+
+    The site's /resume.pdf is the resume PDF committed in resume/, not one built here. check_pdfs warns when a
+    committed PDF no longer matches the content. The dev server turns it off, because the PDFs are naturally out
+    of date while you edit, and it shows a fresh build of the resume instead. ci is for GitHub, which has none of
+    your fonts: it only checks that each resume still builds with the bundled fonts, and publishes the committed
+    PDFs without comparing them.
     """
     try:
         content = load(ROOT)
@@ -49,7 +55,11 @@ def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None, check_pd
         committed = ROOT / "resume" / f"{name}.pdf"
         previous = committed.read_bytes() if committed.exists() else None
         try:
-            pdf, changed = build_pdf(content, name, previous)
+            if ci:
+                compile_resume(content, name, portable=True)  # only to see that it builds; the output is discarded
+                pdf, changed = previous, False
+            else:
+                pdf, changed = build_pdf(content, name, previous)
         except RuntimeError as exc:
             errors.append(f"Resume does not compile: {exc}")
             continue
@@ -57,7 +67,16 @@ def run_build(out: Path, *, drafts: bool, shown_as: Path | None = None, check_pd
             state = "is missing" if previous is None else "is out of date"
             warnings.append(f"resume/{name}.pdf {state}; run `uv run resume` and commit it")
         if name == content.site.website.resume:
-            published = pdf
+            if not check_pdfs and not ci:
+                published = pdf  # the dev server shows your latest edits
+            elif previous is not None:
+                published = previous  # what is committed is what is published
+            elif ci:
+                errors.append(
+                    f"resume/{name}.pdf is missing, so the site has no resume to publish; run `uv run resume` and commit it"
+                )
+            else:
+                published = pdf
 
     report = build_site(content, out, drafts=drafts)
     errors += report.errors
@@ -199,6 +218,12 @@ def main() -> None:
         "--drafts", action="store_true", help="include projects marked hidden (never use for publishing)"
     )
     parser.add_argument("--check", action="store_true", help="only check for problems; write nothing")
+    parser.add_argument(
+        "--ci",
+        action="store_true",
+        help="for GitHub, which lacks your fonts: only check that each resume builds with the bundled fonts, "
+        "and publish the committed resume PDFs",
+    )
     parser.add_argument("--port", type=int, default=8000)
     parser.add_argument("--out", type=Path, default=ROOT / "_site")
     args = parser.parse_args()
@@ -208,8 +233,8 @@ def main() -> None:
         return
     if args.check:
         with tempfile.TemporaryDirectory() as tmp:
-            sys.exit(0 if run_build(Path(tmp) / "site", drafts=args.drafts) else 1)
-    sys.exit(0 if run_build(args.out, drafts=args.drafts) else 1)
+            sys.exit(0 if run_build(Path(tmp) / "site", drafts=args.drafts, ci=args.ci) else 1)
+    sys.exit(0 if run_build(args.out, drafts=args.drafts, ci=args.ci) else 1)
 
 
 def _write_resumes(
@@ -285,7 +310,11 @@ def resume_main() -> None:
     )
     parser.add_argument("--no-copy", action="store_true", help="only write resume/<name>.pdf; don't copy anywhere")
     parser.add_argument("--watch", action="store_true", help="rebuild the PDF on every save (for live preview)")
+    parser.add_argument("--list-fonts", action="store_true", help="list the fonts a resume can use, then stop")
     args = parser.parse_args()
+    if args.list_fonts:
+        print("\n".join(available_fonts(ROOT)))
+        return
     copy_dir = resolve_copy_dir(args.copy_to, args.no_copy)
 
     targets = names if args.name == "all" else [args.name]

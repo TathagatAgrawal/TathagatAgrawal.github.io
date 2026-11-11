@@ -277,7 +277,7 @@ The text of a resume (bullets, `short`, `note`, the profile summary) is converte
 | Add a paper | Add `content/research/<key>/index.md`: citation and summary in the frontmatter, a brief overview and results below it (figures and tables work as on project pages, with images in a `figures/` folder beside it). It gets a page at `/research/<key>/`; list its key under `publications:` in each resume in `content/config.yaml` that should show it |
 | Change the headline or email | Edit the frontmatter of `content/index.md`; the intro paragraph is its body. The preview image shown when the site is shared (`/og-image.png`) is drawn from your name and headline at every build, so it follows along |
 | Change a resume's sections, order, jobs, projects or papers | Edit its entry under `resumes:` in `content/config.yaml` (lists are in display order, so the length is the count) |
-| Change a resume's margins or sizes | Add `layout:` to its entry, e.g. `layout: { margin: 0.4in, gap: 0.45em, name_size: 16pt, font_size: 10pt }` |
+| Change a resume's margins, sizes or font | Add `layout:` to its entry in `content/config.yaml` (see Resume layout and fonts) |
 | Add a resume | Add an entry under `resumes:` in `content/config.yaml` (with a `filename`); `uv run resume <name>` builds it, and `website.resume` picks the one published as `/resume.pdf` |
 | Get the resumes on my phone | Run `uv run resume`: it copies them to iCloud Drive (see Resume PDFs) |
 | Make a resume for one application | Add an entry to `resumes:` with a neutral name (the config is committed, so keep company names out of it), build it with `uv run resume <name>`, and delete the entry afterwards. Save the PDF in `private/` |
@@ -292,11 +292,41 @@ The text of a resume (bullets, `short`, `note`, the profile summary) is converte
 - a project, job or thesis lists a skill id that doesn't exist (it suggests the closest one), or a project's category isn't in `config.yaml`;
 - `config.yaml` names a project, job or paper that doesn't exist (it suggests the closest key), features a project that isn't shown, puts a degree under experience, lists a section with nothing under it, lists a skill line that doesn't exist, or has a layout size without a unit;
 - a figure or CSV file is missing, a figure has no alt text, or a table names a column the CSV doesn't have;
-- any resume fails to build, for example because a bullet contains an image or raw HTML, which a resume can't show;
+- any resume fails to build, for example because a bullet contains an image or raw HTML, which a resume can't show, or because its `font` isn't installed on your computer (GitHub checks with the bundled fonts only, so it skips that);
 - any link or image on the generated site points to a page or file that doesn't exist;
 - a file that would be committed contains something that looks like a phone number, or anything in `private/` is tracked by Git.
 
 It only warns (the site still builds) about search-engine problems: a page with no meta description, one under 70 or over about 160 characters, or two pages with the same title or description.
+
+## Resume layout and fonts
+
+Each resume can change its look with a `layout:` line in its entry in `content/config.yaml`. Everything is optional, and a resume without it uses the defaults.
+
+```yaml
+resumes:
+  general:
+    layout: { margin: 0.25in, gap: 0.45em, name_size: 18pt, heading_size: 11pt, font_size: 9.5pt, font: New Computer Modern, accent: "#0b5cad" }
+```
+
+| Option | What it sets | Default |
+| --- | --- | --- |
+| `margin` | the page margin, on all four sides | `0.5in` |
+| `gap` | the space between paragraphs, list items and entries | `0.625em` |
+| `name_size` | the size of your name at the top of the resume | `20pt` |
+| `heading_size` | the size of the section headings (Work Experience, Projects, ...) | `12pt` |
+| `font_size` | the size of the body text | `10pt` |
+| `font` | the font family: one name, or a list to try in order (`[Inter, New Computer Modern]`) | Libertinus Serif |
+| `accent` | the theme color of your name, the section headings and their rules, and the links: a hex color **in quotes** (`"#0b5cad"`; without the quotes YAML reads the `#` as a comment) or a color name (`navy`, `teal`, `maroon`, `green`, `red`, ...) | Typst's blue (`"#0074d9"`) |
+
+Sizes are a number with a unit (`in`, `pt`, `mm`, `cm` or `em`); a number without a unit is an error.
+
+**Fonts.** A resume can use any font installed on your computer (Georgia, Helvetica Neue, Avenir Next, ...), as well as the fonts bundled with the build (**Libertinus Serif**, the default, **New Computer Modern**, the classic LaTeX look, and DejaVu Sans Mono) and any font files you put in `resume/fonts/`. `uv run resume --list-fonts` prints every family it can use. A PDF embeds the fonts it uses, so it looks the same on any device even though only your computer needs the font.
+
+A font name that isn't available is an error with a "did you mean" hint, because Typst would otherwise quietly use a different font. Names are not case sensitive.
+
+The resumes are built on your computer, and **GitHub does not rebuild them**: it doesn't have your fonts, so a rebuild there would look different. It publishes the PDFs you committed (see Resume PDFs). Because of that you don't need to put font files in the repository; `resume/fonts/` is only for a font that isn't installed on your computer. If you do commit font files, only commit ones you are allowed to redistribute, since this repository is public: open fonts under the SIL Open Font License (Inter, Source Sans 3, Lato, EB Garamond and many others) are fine; fonts that came with your computer or an Office installation are not.
+
+A different font changes how much fits on a page. The one-page `general` resume can spill onto a second page with a wider font, so adjust `font_size`, `margin` or `gap` and check the page count (`pdfinfo resume/general.pdf`).
 
 ## Resume PDFs
 
@@ -308,6 +338,8 @@ git add resume && git commit  # keep them in the repository
 ```
 
 A PDF records the date it was made, so a rebuild would normally change every file. To avoid that, a resume is rebuilt with the date already inside the existing PDF: if the result is identical the file is left alone, and the date only moves forward when the content really changed. `uv run build --check` (and the pre-commit hook) warns when a committed PDF no longer matches the content, so you are reminded to rebuild it.
+
+**GitHub publishes the PDF you committed.** The website's `/resume.pdf` is the committed `resume/general.pdf`, not a fresh build, and GitHub's workflow (`uv run build --ci`) only checks that every resume still builds with the bundled fonts, which it does without your fonts or comparing PDFs. So rebuild and commit the PDFs before you push a change to a resume: whatever is in `resume/` is what visitors download. (On your own computer `uv run build` publishes the committed PDF too, and the dev server `uv run build --serve` shows a fresh build so you see your edits.)
 
 **A copy on your phone.** Each run also copies the PDFs into the `Resumes` folder of your iCloud Drive (`~/Library/Mobile Documents/com~apple~CloudDocs/Resumes`), so they appear on your iPhone in the Files app. Each copy is named by `filename` in its entry in `content/config.yaml` (for example `Tathagat Agrawal - Resume (ML).pdf`, which is what a recruiter sees when you send it). The folder is created if iCloud Drive exists, and a file is only rewritten when it changed, so iCloud isn't made to re-upload identical PDFs. On a machine without iCloud Drive the copy is simply skipped.
 
@@ -349,7 +381,7 @@ The **code** (the site and resume builders, templates, stylesheet, Typst layout,
 
 ## Publishing
 
-Every push to `main` runs `.github/workflows/publish.yml` (which fetches the full Git history, for the sitemap's dates): it builds the site and the general resume, runs the tests, and deploys to GitHub Pages. GitHub Pages is free only for public repositories, so while this repository is private the deploy step is skipped and the workflow only checks the build.
+Every push to `main` runs `.github/workflows/publish.yml` (which fetches the full Git history, for the sitemap's dates): it checks the content and that each resume builds, publishes the resume PDFs you committed, runs the tests, and deploys to GitHub Pages. GitHub Pages is free only for public repositories, so while this repository is private the deploy step is skipped and the workflow only checks the build.
 
 To go live:
 

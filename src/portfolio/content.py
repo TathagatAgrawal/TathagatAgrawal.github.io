@@ -326,23 +326,78 @@ class Category(Strict):
 
 Section = Literal["summary", "skills", "experience", "projects", "publications", "education", "certifications"]
 LENGTH = re.compile(r"^\d+(\.\d+)?(pt|in|mm|cm|em)$")
+HEX_COLOR = re.compile(r"^#(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$")
+# The color names Typst has built in.
+COLOR_NAMES = [
+    "black",
+    "gray",
+    "silver",
+    "white",
+    "navy",
+    "blue",
+    "aqua",
+    "teal",
+    "eastern",
+    "purple",
+    "fuchsia",
+    "maroon",
+    "red",
+    "orange",
+    "yellow",
+    "olive",
+    "green",
+    "lime",
+]
 
 
 class ResumeLayout(Strict):
-    """Optional size overrides for one resume; each is a Typst length such as 0.4in, 16pt or 0.45em."""
+    """Optional layout overrides for one resume.
+
+    The sizes are Typst lengths such as 0.4in, 16pt or 0.45em. `font` is a font family, or a list of them to
+    try in order; it must be one of the fonts bundled with the build or one whose files are in resume/fonts/.
+    `accent` is the theme color: a hex color such as "#0b5cad" (in quotes, since # starts a comment in YAML) or a
+    Typst color name such as navy. It colors your name, the section headings and their rules, and the links.
+    """
 
     margin: str | None = None
     gap: str | None = None
     name_size: str | None = None
+    heading_size: str | None = None
     font_size: str | None = None
+    font: list[str] | None = None
+    accent: str | None = None
 
-    @field_validator("*", mode="before")
+    @field_validator("margin", "gap", "name_size", "heading_size", "font_size", mode="before")
     @classmethod
     def _check_length(cls, value: object) -> object:
         """Require a number with a unit, which is what Typst needs."""
         if value is not None and not LENGTH.match(str(value)):
             raise ValueError(f"expected a length with a unit such as 0.4in, 16pt or 0.45em, got {value!r}")
         return str(value) if value is not None else None
+
+    @field_validator("accent", mode="before")
+    @classmethod
+    def _check_accent(cls, value: object) -> object:
+        """Accept a hex color or a Typst color name, and nothing else (the value is evaluated as Typst)."""
+        if value is None:
+            return None
+        text = str(value).strip()
+        if not (HEX_COLOR.match(text) or text in COLOR_NAMES):
+            raise ValueError(
+                f'expected a hex color in quotes such as "#0b5cad", or one of {", ".join(COLOR_NAMES)}; got {value!r}'
+            )
+        return text
+
+    @field_validator("font", mode="before")
+    @classmethod
+    def _check_font(cls, value: object) -> object:
+        """Accept one family name or a list of them, and reject empty names."""
+        if value is None:
+            return None
+        names = [value] if isinstance(value, str) else value
+        if not isinstance(names, list) or not names or not all(isinstance(n, str) and n.strip() for n in names):
+            raise ValueError("expected a font family name such as New Computer Modern, or a list of them")
+        return [n.strip() for n in names]
 
 
 class SkillLineRef(Strict):

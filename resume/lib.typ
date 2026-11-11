@@ -28,17 +28,25 @@
   let gap = size("gap", 0.625em)
   let name-size = size("name-size", 20pt)
   let font-size = size("font-size", 10pt)
-  let accent = blue
+  let heading-size = size("heading-size", 12pt)
+  // The font family (or families to try in order); without one Typst's default text font is used.
+  let font = model.layout.at("font", default: none)
+  // The theme color: a hex color ("#0b5cad") or one of Typst's color names (navy, teal, ...), already checked in Python.
+  let accent = if "accent" in model.layout {
+    let c = model.layout.accent
+    if c.starts-with("#") { rgb(c) } else { eval(c) }
+  } else { blue }
 
   set document(title: model.name + " – Resume", author: model.name)
   set page(paper: "a4", margin: margin, numbering: none)
   set par(justify: true, spacing: gap, leading: gap)
   set text(size: font-size)
+  set text(font: font) if font != none
   set terms(separator: text(weight: "bold", ": "), spacing: gap)
   set list(spacing: gap, tight: true)
   show heading.where(level: 1): it => {
     v(-0.125em)
-    text(size: 12pt, fill: accent, it)
+    text(size: heading-size, fill: accent, it)
     v(-1.05em)
     line(length: 100%, stroke: accent)
   }
