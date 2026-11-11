@@ -3,7 +3,7 @@ title: "Anuchhed: citation-first Q&A over the Constitution of India"
 date: 2026-11
 category: llm
 repository: constitution-rag
-private: true
+private: false
 skills: [rag, embeddings, llm-evaluation, langgraph, llm-apis, prompt-engineering, fastapi, databases, web-frontend, python]
 
 summary: >-

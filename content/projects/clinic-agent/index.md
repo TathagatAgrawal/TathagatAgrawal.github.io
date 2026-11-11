@@ -3,7 +3,7 @@ title: "Clinic Agent: AI-assisted appointment scheduling"
 date: 2026-10
 category: llm
 repository: clinic-agent
-private: true
+private: false
 skills: [embeddings, scikit-learn, calibration, experiment-design, llm-apis, prompt-engineering, llm-evaluation, fastapi, databases, testing, web-frontend, python]
 
 summary: >-

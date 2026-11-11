@@ -3,7 +3,7 @@ title: Invoice Generator
 date: 2026-10
 category: tools
 repository: invoice-generator
-private: true
+private: false
 skills: [documents, fastapi, pydantic, web-frontend, testing, python]
 
 summary: >-

@@ -3,7 +3,7 @@ title: Backtest Lab
 date: 2026-11
 category: quant
 repository: backtest-lab
-private: true
+private: false
 skills: [backtesting, risk-metrics, market-data, optuna, experiment-design, fastapi, databases, testing, web-frontend, excel, python]
 
 summary: >-

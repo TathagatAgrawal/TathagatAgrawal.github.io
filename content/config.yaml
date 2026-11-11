@@ -78,12 +78,13 @@ resumes:
     sections: [summary, skills, experience, projects, publications, education]
     skills: [languages-and-tools, generative-ai, ml-and-dl, deployment-mlops, data-and-viz]
     experience: [neural-nurture]
-    projects: [agentic-eval-framework, ai-clinic-scheduler, strategy-backtester]
-    other_projects: [unet-segmentation, stellar-classification]  # one line each, under "Other projects"
+    projects: [anuchhed, agentic-eval-framework, ai-clinic-scheduler]
+    other_projects: [trade-filter-ml, mbert-ner]  # one line each, under "Other projects"
     publications: [grokking-review, grokking-rigidity, mbert-ner]
     education: [vit-bhopal]
-    layout: { margin: 0.4in, gap: 0.45em }
-
+    layout: { margin: 0.25in, gap: 0.45em, font_size: 10pt, heading_size: 12pt }
+    # layout: {
+      # margin: 0.25in, gap: 0.45em, name_size: 18pt, heading_size: 11pt, font_size: 9.5pt, font: New Computer Modern, accent: "#0b5cad" }
   # Two pages, for ML, NLP and LLM roles.
   ml:
     filename: Tathagat Agrawal - Resume (ML)

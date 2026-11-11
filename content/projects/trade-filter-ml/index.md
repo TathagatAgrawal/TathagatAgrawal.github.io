@@ -3,7 +3,7 @@ title: Trade Filter ML
 date: 2026-11
 category: quant
 repository: trade-filter-ml
-private: true
+private: false
 skills: [experiment-design, gradient-boosting, scikit-learn, calibration, optuna, mlflow, shap, pandas, market-data, risk-metrics, python]
 
 summary: >-
