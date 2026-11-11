@@ -127,3 +127,73 @@ def test_unknown_description_key_is_reported(tmp_path: Path) -> None:
     config.write_text(config.read_text().replace('  skills: "Skills of', '  skils: "Skills of'))
     with pytest.raises(ContentError, match=r"descriptions: 'skils' is not a page \(did you mean 'skills'"):
         load(tmp_path)
+
+
+def visible_and_structured_trails(page: Path) -> tuple[list[tuple[str, str | None]], list[tuple[str, str]]]:
+    """The breadcrumbs a page shows, as (name, link or None), and those in its structured data, as (name, address)."""
+    text = page.read_text(encoding="utf-8")
+    nav = re.search(r'<nav class="crumbs".*?</nav>', text, re.DOTALL)
+    assert nav, page
+    visible = []
+    for item in re.findall(r"<li>(.*?)</li>", nav.group(0), re.DOTALL):
+        link = re.search(r'href="([^"]+)"', item)
+        visible.append((html.unescape(re.sub(r"<[^>]+>", "", item)).strip(), link.group(1) if link else None))
+    data = re.search(r'<script type="application/ld\+json">(.*?)</script>', text, re.DOTALL)
+    graph = json.loads(data.group(1))["@graph"]
+    trail = next(item for item in graph if item["@type"] == "BreadcrumbList")
+    return visible, [(i["name"], i["item"]) for i in trail["itemListElement"]]
+
+
+def test_deep_pages_show_the_path_from_the_home_page(built: tuple[Path, list[str]]) -> None:
+    """A project, paper or thesis page shows "/ Section / its own title", the last one unlinked."""
+    out, _ = built
+    for rel, section, href in [
+        ("projects/anuchhed", "Projects", "/projects/"),
+        ("research/grokking-rigidity", "Research", "/research/"),
+        ("research/grokking-thesis", "Research", "/research/"),
+    ]:
+        visible, _ = visible_and_structured_trails(out / rel / "index.html")
+        assert [v[0] for v in visible][:2] == ["/", section], rel
+        assert visible[0] == ("/", "/") and visible[1] == (section, href), rel
+        assert len(visible) == 3 and visible[2][1] is None and len(visible[2][0]) > len(section), rel
+
+
+def test_section_pages_show_home_and_the_section(built: tuple[Path, list[str]]) -> None:
+    """A top-level page shows "/ Its name", the slash linking home and the page itself unlinked."""
+    out, _ = built
+    for rel, name in [
+        ("projects", "Projects"),
+        ("experience", "Experience"),
+        ("skills", "Skills"),
+        ("contact", "Contact"),
+    ]:
+        visible, _ = visible_and_structured_trails(out / rel / "index.html")
+        assert visible == [("/", "/"), (name, None)], rel
+
+
+def test_home_and_404_have_no_breadcrumbs(built: tuple[Path, list[str]]) -> None:
+    """The home page is the root and the 404 page has no place in the site, so neither shows a trail."""
+    out, _ = built
+    assert 'class="crumbs"' not in (out / "index.html").read_text(encoding="utf-8")
+    assert 'class="crumbs"' not in (out / "404.html").read_text(encoding="utf-8")
+
+
+def test_visible_and_structured_breadcrumbs_agree(built: tuple[Path, list[str]]) -> None:
+    """Every page's visible trail and its structured-data trail name the same pages in the same order."""
+    out, _ = built
+    base = "https://tathagatagrawal.github.io"
+    for page in sorted(out.rglob("index.html")):
+        if page == out / "index.html":
+            continue
+        visible, structured = visible_and_structured_trails(page)
+        assert ["Home" if name == "/" else name for name, _ in visible] == [name for name, _ in structured], page
+        for (_, href), (_, address) in zip(visible[:-1], structured[:-1], strict=True):
+            assert base + href == address, page
+        assert structured[-1][1] == f"{base}/{page.parent.relative_to(out)}/", page
+
+
+def test_the_root_slash_is_named_home_for_screen_readers(built: tuple[Path, list[str]]) -> None:
+    """The link that is drawn as a bare "/" has the accessible name and tooltip "Home"."""
+    out, _ = built
+    text = (out / "projects" / "anuchhed" / "index.html").read_text(encoding="utf-8")
+    assert '<a href="/" aria-label="Home" title="Home">/</a>' in text

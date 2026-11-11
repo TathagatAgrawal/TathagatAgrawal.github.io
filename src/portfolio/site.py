@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import datetime as dt
+import hashlib
 import shutil
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -87,6 +88,20 @@ def _source_url(content: Content, repository: str | None, private: bool) -> str 
     return f"{content.profile.links.github.rstrip('/')}/{repository}"
 
 
+def asset_versions() -> dict[str, str]:
+    """A short fingerprint of each stylesheet and script, for the `?v=` on their addresses.
+
+    The fingerprint changes exactly when the file's contents do. Without it a browser (or GitHub Pages' ten
+    minute cache) keeps serving an old stylesheet beside new pages, and a new part of the page, such as the
+    breadcrumbs, shows up unstyled.
+    """
+    return {
+        f.name: hashlib.sha256(f.read_bytes()).hexdigest()[:10]
+        for f in sorted(STATIC.iterdir())
+        if f.suffix in {".css", ".js"}
+    }
+
+
 def _write(path: Path, text: str) -> None:
     """Write a generated file, creating its folder."""
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -126,21 +141,13 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "profile": content.profile,
         "nav": NAV,
         "drafts": drafts,
+        "assets": asset_versions(),
         "updated": format_date(dt.date.today().strftime("%Y-%m")),
     }
 
     site_url = content.site.url.rstrip("/")
     descriptions = content.site.descriptions
     meta: list[seo.PageSeo] = []
-
-    def ld(*items: dict[str, object] | list[dict[str, object]]) -> str:
-        """Structured data (JSON-LD) for a page, from one or more schema.org items."""
-        flat = [x for item in items for x in (item if isinstance(item, list) else [item])]
-        return seo.to_json(flat)
-
-    def crumbs(*trail: tuple[str, str]) -> dict[str, object]:
-        """A breadcrumb trail from the home page down to the given (name, path) pairs."""
-        return seo.breadcrumbs([("Home", site_url + "/"), *[(n, site_url + path) for n, path in trail]])
 
     def page(
         template: str,
@@ -149,15 +156,22 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         title: str,
         description: str | None = None,
         *,
-        jsonld: str | None = None,
+        trail: list[tuple[str, str]] | None = None,
+        structured: list[dict[str, object]] | None = None,
         og_type: str = "website",
         **extra: object,
     ) -> None:
         """Render one template to the file for a site path such as /projects/.
 
         title is the page's own title: the <title> adds the site name and is kept short enough for search
-        results, while the page's <h1> and the social preview keep the full text.
+        results, while the page's <h1> and the social preview keep the full text. trail is the path from the
+        home page to this page as (name, path) pairs, ending with the page itself; it is shown as breadcrumbs
+        (the last one unlinked) and also written into the structured data, so the two always agree.
         """
+        crumbs = [("Home", "/"), *trail] if trail else []
+        items = list(structured or [])
+        if crumbs:
+            items.append(seo.breadcrumbs([(n, site_url + p) for n, p in crumbs]))
         if path == "/":
             tag = og_title = content.site.home_title
         else:
@@ -171,7 +185,8 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
             page_title=tag,
             og_title=og_title,
             og_type=og_type,
-            jsonld=jsonld,
+            jsonld=seo.to_json(items) if items else None,
+            crumbs=[(n, p) for n, p in crumbs[:-1]] + [(crumbs[-1][0], None)] if crumbs else [],
             description=desc,
             **extra,
         )
@@ -192,7 +207,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "/",
         "home",
         name,
-        jsonld=ld(seo.home_graph(name, site_url, content.profile.headline, profile_links, work, education)),
+        structured=seo.home_graph(name, site_url, content.profile.headline, profile_links, work, education),
         featured=featured,
         project_count=len(listed),
         work=work,
@@ -207,7 +222,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "projects",
         "Projects",
         descriptions.get("projects"),
-        jsonld=ld(crumbs(("Projects", "/projects/"))),
+        trail=[("Projects", "/projects/")],
         groups=groups,
     )
     categories = {c.id: c for c in content.site.categories}
@@ -226,7 +241,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
             "projects",
             p.data.title,
             seo.description(p.data.summary),
-            jsonld=ld(crumbs(("Projects", "/projects/"), (p.data.title, f"/projects/{p.key}/"))),
+            trail=[("Projects", "/projects/"), (p.data.title, f"/projects/{p.key}/")],
             og_type="article",
             p=p,
             category=categories[p.data.category],
@@ -244,7 +259,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "experience",
         "Experience",
         descriptions.get("experience"),
-        jsonld=ld(crumbs(("Experience", "/experience/"))),
+        trail=[("Experience", "/experience/")],
         work=work,
         education=education,
         certifications=content.certifications,
@@ -268,7 +283,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "skills",
         "Skills",
         descriptions.get("skills"),
-        jsonld=ld(crumbs(("Skills", "/skills/"))),
+        trail=[("Skills", "/skills/")],
         groups=content.skills.groups,
         evidence=evidence,
     )
@@ -286,7 +301,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
         "research",
         "Research",
         descriptions.get("research"),
-        jsonld=ld(crumbs(("Research", "/research/"))),
+        trail=[("Research", "/research/")],
         publications=content.publications,
         theses=[(t, degrees[t.degree]) for t in content.theses],
     )
@@ -311,7 +326,8 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
             "research",
             entry.title,
             seo.description(entry.summary),
-            jsonld=ld(structured, crumbs(("Research", "/research/"), (entry.title, path))),
+            trail=[("Research", "/research/"), (entry.title, path)],
+            structured=[structured],
             og_type="article",
             body=Markup(body),
             **extra,
@@ -350,7 +366,7 @@ def build_site(content: Content, out: Path, *, drafts: bool = False) -> BuildRep
             key,
             label,
             descriptions.get(key),
-            jsonld=ld(crumbs((label, f"/{key}/"))),
+            trail=[(label, f"/{key}/")],
             body=Markup(body),
         )
 

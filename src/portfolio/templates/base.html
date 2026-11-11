@@ -16,7 +16,7 @@
 <meta property="og:image:alt" content="{{ profile.name }}: {{ profile.headline }}">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-<link rel="stylesheet" href="/style.css">
+<link rel="stylesheet" href="/style.css?v={{ assets['style.css'] }}">
 {%- block head %}{% endblock %}
 {%- if jsonld %}
 <script type="application/ld+json">{{ jsonld|safe }}</script>
@@ -42,6 +42,15 @@
 {%- if drafts %}
   <p class="meta"><strong>Preview build:</strong> projects hidden from the published site are included and marked.</p>
 {%- endif %}
+{%- if crumbs %}
+<nav class="crumbs" aria-label="Breadcrumb">
+  <ol>
+    {%- for name, href in crumbs %}
+    <li>{% if loop.first %}<a href="{{ href }}" aria-label="{{ name }}" title="{{ name }}">/</a>{% elif href %}<a href="{{ href }}">{{ name }}</a>{% else %}<span aria-current="page" title="{{ name }}">{{ name }}</span>{% endif %}</li>
+    {%- endfor %}
+  </ol>
+</nav>
+{%- endif %}
 {% block content %}{% endblock %}
 </main>
 
@@ -52,6 +61,6 @@
   Last updated {{ updated }}
 </footer>
 
-<script src="/theme.js"></script>
+<script src="/theme.js?v={{ assets['theme.js'] }}"></script>
 </body>
 </html>

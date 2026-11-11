@@ -74,6 +74,19 @@ table { border-collapse: collapse; width: 100%; }
 th, td { text-align: left; vertical-align: top; padding: 0.4rem 0.75rem 0.4rem 0; border-bottom: 1px solid var(--rule); }
 
 /* Figures fill the column; wide ones (plots) extend up to 60rem so their labels stay readable. */
+/* Breadcrumbs: the path from the home page to this page. The current page is the last item, cut short with an
+   ellipsis when its title is long, so the trail stays on one line. */
+.crumbs ol { display: flex; align-items: baseline; margin: 0 0 0.4rem; padding: 0; list-style: none; color: var(--muted); }
+.crumbs li { margin: 0; white-space: nowrap; }
+.crumbs li + li::before { content: "/"; margin: 0 0.5em; }
+/* The first item is the home page, drawn as a slash that starts the path ("/ Projects / ..."), so the next item
+   needs no separator of its own. Its link is padded (and the margins cancel the padding, so nothing moves) so the small
+   slash is easy to tap. */
+.crumbs li:first-child + li::before { content: none; }
+.crumbs li:first-child a { display: inline-block; padding: 0.25em 0.75em 0.25em 0.5em; margin: 0 -0.25em 0 -0.5em; text-decoration: none; }
+.crumbs li:first-child a:hover { text-decoration: underline; }
+.crumbs li:last-child { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+
 figure { margin: 2rem 0; }
 figure img { display: block; width: 100%; height: auto; }
 /* Figures that have no dark variant (no light-only/dark-only class) are dimmed in dark mode, so a white plot doesn't glare. */

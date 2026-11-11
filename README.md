@@ -325,7 +325,8 @@ A symlink would not work for the iCloud copy: iCloud stores a link as a path on 
 
 - A `<title>` of at most 60 characters on every page: "Page · Name" when that fits, otherwise the page title alone, cut at a word. The page's own heading and the social preview keep the full text.
 - A `<meta description>` on every page, cut at a word near 155 characters, as plain text. Projects, papers and the thesis use their `summary`; the other pages use `descriptions` in `content/config.yaml`.
-- Structured data (JSON-LD, schema.org): a `Person` and `WebSite` on the home page (your name, job, university and profile links), a `ScholarlyArticle` with authors and DOI for each paper, a `Thesis`, and breadcrumbs on every other page. It is built from the content files, so it can't disagree with the pages.
+- Structured data (JSON-LD, schema.org): a `Person` and `WebSite` on the home page (your name, job, university and profile links), a `ScholarlyArticle` with authors and DOI for each paper, a `Thesis`, and the breadcrumb trail of every other page. It is built from the content files, so it can't disagree with the pages.
+- Breadcrumbs at the top of every page except the home page and the 404 page: the path from the home page to the page (`/ Projects / Anuchhed…`, where the leading slash is the home page), the last item unlinked and cut short with an ellipsis if its title is long. The same trail is written into the structured data, so what readers and search engines see always agrees.
 - A sitemap with the date each page's files last changed (from Git history), a `robots.txt` that points to it, a canonical address on every page, and `noindex` on the 404 page.
 - A social preview image drawn from your name and headline, and `og:type` set to `article` for projects and papers.
 

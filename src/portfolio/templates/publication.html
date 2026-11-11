@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block content %}
-  <p class="meta"><a href="/research/">Research</a></p>
   <h1>{{ pub.title }}</h1>
   <p class="meta">{{ pub.authors|join(", ") }} &middot; {{ venue(pub.venue) }}{% if pub.year|string not in pub.venue %}, {{ pub.year }}{% endif %}
     {%- if pub.url %} &middot; <a href="{{ pub.url }}">{{ pub.url_label }}</a>{% endif %}
