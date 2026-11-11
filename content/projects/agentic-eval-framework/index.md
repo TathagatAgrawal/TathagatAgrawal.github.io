@@ -47,15 +47,7 @@ The test bed is a personal-finance Q&A agent over a synthetic transaction histor
 
 All four architectures, using the same model (`gemini-3.5-flash-lite`), the same tools and the same data:
 
-| Metric | LangGraph | Monolithic ReAct | Context-stuffing | Plan-and-execute |
-| --- | ---: | ---: | ---: | ---: |
-| Numeric correctness | **100%** | 83.3% | 83.3% | 75.0% |
-| Groundedness (self-reported) | **100%** | **100%** | 50.0% | **100%** |
-| Groundedness (recomputed) | **100%** | **100%** | 50.0% | **100%** |
-| Contextual correctness | **100%** | 50.0% | 0.0% | **100%** |
-| Clarification | 86.7% | 80.0% | **93.3%** | **93.3%** |
-| Refusal | **100%** | **100%** | **100%** | **100%** |
-| Efficiency (calls ≤ optimal) | 16.7% | 50.0% | **100%** | 66.7% |
+![Grouped horizontal bar chart of seven evaluation metrics for four agent architectures. LangGraph scores 100% on numeric correctness, both groundedness checks, contextual correctness and refusal, but only 86.7% on clarification and 16.7% on efficiency. Monolithic ReAct is 100% on groundedness and refusal but 50% on contextual correctness. Context-stuffing is the most efficient at 100% but scores 50% on groundedness and 0% on contextual correctness. Plan-and-execute is 100% on groundedness, contextual correctness and refusal, 75% on numeric correctness and 66.7% on efficiency.](figures/architecture-comparison.svg "Scores of the four architectures on each metric, with the best in each row in bold.")
 
 No architecture wins every row. The state machine is the most correct but the least efficient, because it can probe repeatedly. Context-stuffing is efficient by construction, but its groundedness collapses: when "the evidence" is a whole table of monthly totals, almost any number can be found in it, so a groundedness check can't tell right from wrong. Plan-and-execute fails differently again: once its single upfront plan asks for too little, it has no chance to correct itself.
 

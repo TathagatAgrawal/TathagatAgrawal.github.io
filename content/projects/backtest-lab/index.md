@@ -32,6 +32,8 @@ Most retail backtesting tools make it easy to find a strategy that looks great o
 
 A web app on top of [NautilusTrader](https://github.com/nautechsystems/nautilus_trader), which does all the simulation; the app translates strategies into it and orchestrates runs.
 
+![A backtest report for an SMA Crossover strategy on SPY from 2010 to 2026. Eight headline numbers sit above an equity chart that compares the strategy with buy and hold, and a drawdown chart. The strategy returned 350% against 796% for buy and hold.](figures/report.webp "A finished backtest report. Every figure is shown next to buy and hold, and here the strategy loses to it: 350% total return against 796%. Runs use real SPY prices, next-open fills, 5 bps slippage and 0.05% commission.")
+
 - **Strategy builder:** parameters, 24 TA-Lib indicators, ALL/ANY/NOT condition trees with comparisons and crossovers, stop loss, take profit, trailing stops and position sizing. Strategies can also be edited as JSON, are validated live with located errors, and are saved as immutable versions. Six starter strategies come with tutorials.
 - **Markets:** fuzzy search over about 15,000 US and Indian (NSE) securities built from the exchanges' official symbol files. Indian stocks run in rupees with NSE/BSE session times.
 - **Backtests:** daily bars, run in background worker processes with live progress and cancellation. Reports show performance against buy-and-hold, equity, drawdown, trades on the price chart and a trade log, with an Excel export.

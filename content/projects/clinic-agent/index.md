@@ -39,6 +39,8 @@ This is the second, rebuilt version of my [first AI clinic scheduler](https://gi
 - **Booking:** a single module owns all writes to appointments, with database constraints that make double-booking impossible, and tested reschedule and cancellation rules.
 - **Security:** Argon2id passwords, server-side sessions, CSRF tokens, lockout and rate limits, strict content security policy, an append-only audit log that never contains symptom text, and scrubbing of identifiers before any text reaches an LLM.
 
+![The Choose a time page of the clinic app. For a described itchy rash, it offers three Dermatology appointments with Dr. Sameer Khan, each with experience, languages, the reason it matches and a Choose this time button.](figures/choose-a-time.webp "The patient's description was routed to Dermatology, and each option says why it was offered. Demo data: the doctors and the concern are synthetic, and the LLM summary was switched off.")
+
 ## Result
 
 I compared the original hand-tuned similarity router with the trained classifier on 218 held-out cases, written before any of this round's training and evaluated once, and on two perturbed copies of them (typos, and the concern wrapped in chatty text).

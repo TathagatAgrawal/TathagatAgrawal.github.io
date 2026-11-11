@@ -27,6 +27,8 @@ Tax practitioners using CompuTax keep each year's files in a separate folder. Pu
 
 A small app that does it in one step: choose the CompuTax folder once, search for a client by ID or name, pick the years and a destination, and click **Copy files**. Each client gets one folder; files without the year in their name get it added (for example `ITRV_109B_2021.pdf`).
 
+![ITR Fetch with a client, Asha Verma, chosen from a fuzzy search, four of her five years selected, and the destination folder shown before the Copy files button.](figures/app.webp "The app after choosing a client and years. The folder it reads holds invented sample clients, not real ones.")
+
 - **Safe by design:** it never changes anything inside the CompuTax folder and never overwrites a file in the destination. The only thing it saves is the location of the CompuTax folder.
 - **Nothing to install:** a single app for Windows and for Apple-silicon Macs. It opens in the browser, listens only on the local machine, and quits a few seconds after the tab is closed.
 - **Fuzzy client search** in plain JavaScript, with its own tests alongside the Python tests.

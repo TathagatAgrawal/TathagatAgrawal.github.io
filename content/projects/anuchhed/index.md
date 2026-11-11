@@ -34,6 +34,8 @@ General-purpose chatbots answer legal questions fluently but cite loosely or not
 - **Verified answers.** The model drafts an answer in which every statement cites a provision; a verifier checks each citation and quote against the official text and repairs or removes anything that doesn't match. A LangGraph conversation layer handles follow-up questions.
 - **A deterministic evaluation.** Gold questions record which provisions a correct answer must rest on and which facts it must contain; the evaluator refuses to run if a gold fact isn't actually in the cited text.
 
+![The Anuchhed answer page. A question about whether education is a fundamental right is answered in a short cited paragraph, with a badge reading 1 of 1 statements checked against the official text. A side panel shows Article 21A with its amendment history and the matching words highlighted.](figures/answer.webp "An answer to \"Is education a fundamental right?\". Each citation opens the official text with the quoted words highlighted, and the badge reports how many statements were checked against it.")
+
 ## Results so far
 
 Deterministic reference lookup is the largest single retrieval gain for every search method:
