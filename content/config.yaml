@@ -50,6 +50,7 @@ website:
     - backtest-lab
     - strategy-backtester
     # Software for everyday use
+    - simple-task-management
     - itr-fetch
     - invoice-generator
     - nse-data-fetcher
@@ -79,7 +80,7 @@ resumes:
     skills: [languages-and-tools, generative-ai, ml-and-dl, deployment-mlops, data-and-viz]
     experience: [neural-nurture]
     projects: [anuchhed, agentic-eval-framework, ai-clinic-scheduler]
-    other_projects: [trade-filter-ml, mbert-ner]  # one line each, under "Other projects"
+    other_projects: [simple-task-management, trade-filter-ml, mbert-ner]  # one line each, under "Other projects"
     publications: [grokking-review, grokking-rigidity, mbert-ner]
     education: [vit-bhopal]
     layout: { margin: 0.25in, gap: 0.45em, font_size: 10pt, heading_size: 12pt }
@@ -94,10 +95,10 @@ resumes:
     projects:
       - agentic-eval-framework
       - ai-clinic-scheduler
+      - simple-task-management
       - mbert-ner
       - strategy-backtester
       - stellar-classification
-      - unet-segmentation
     publications: [grokking-review, grokking-rigidity, mbert-ner]
     education: [vit-bhopal]
 
@@ -116,10 +117,10 @@ resumes:
     projects:
       - strategy-backtester
       - ai-clinic-scheduler
+      - simple-task-management
       - mbert-ner
       - stellar-classification
       - unet-segmentation
-      - crop-disease
     publications: [grokking-review, grokking-rigidity, mbert-ner]
     education: [vit-bhopal]
     layout: { name_size: 16pt }
