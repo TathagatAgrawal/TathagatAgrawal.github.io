@@ -8,7 +8,7 @@ dependencies = [
     "markdown-it-py>=3.0",
     "pillow>=11.0",
     "pydantic>=2.9",
-    "pyyaml>=6.0",
+    "pyyaml>=6.0.4",
     "typst>=0.15.2",
 ]
 
